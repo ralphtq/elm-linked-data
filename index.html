@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>OpenEngiadina</title>
+  <title>TalkToQUDT</title>
   <style>body { padding: 0; margin: 0; }</style>
 </head>
 
@@ -5350,197 +5350,9 @@ var $author$project$RDF$Graph = function (a) {
 var $author$project$RDF$fromList = function (ts) {
 	return $author$project$RDF$Graph(ts);
 };
-var $author$project$OpenEngiadina$Receive = function (a) {
-	return {$: 'Receive', a: a};
+var $author$project$TalkToQUDT$GotQUDT = function (a) {
+	return {$: 'GotQUDT', a: a};
 };
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
-var $elm$json$Json$Decode$keyValuePairs = _Json_decodeKeyValuePairs;
-var $author$project$RDF$BNode = function (a) {
-	return {$: 'BNode', a: a};
-};
-var $author$project$RDF$blankNode = function (id) {
-	return $author$project$RDF$BNode(id);
-};
-var $author$project$RDF$iri = $elm$core$Basics$identity;
-var $author$project$RDF$NodeBlankNode = function (a) {
-	return {$: 'NodeBlankNode', a: a};
-};
-var $author$project$RDF$subjectBlankNode = function (bnode) {
-	return $author$project$RDF$NodeBlankNode(bnode);
-};
-var $author$project$RDF$NodeIRI = function (a) {
-	return {$: 'NodeIRI', a: a};
-};
-var $author$project$RDF$subjectIRI = function (i) {
-	return $author$project$RDF$NodeIRI(i);
-};
-var $author$project$RDF$JSON$subjectDecoder = function (key) {
-	return A2($elm$core$String$startsWith, '_:', key) ? $author$project$RDF$subjectBlankNode(
-		$author$project$RDF$blankNode(
-			A2($elm$core$String$dropLeft, 2, key))) : $author$project$RDF$subjectIRI(
-		$author$project$RDF$iri(key));
-};
-var $elm$json$Json$Decode$list = _Json_decodeList;
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var $author$project$RDF$predicateIRI = function (i) {
-	return $author$project$RDF$NodeIRI(i);
-};
-var $author$project$RDF$JSON$predicateDecoder = A2($elm$core$Basics$composeR, $author$project$RDF$iri, $author$project$RDF$predicateIRI);
-var $elm$json$Json$Decode$andThen = _Json_andThen;
-var $elm$json$Json$Decode$fail = _Json_fail;
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $author$project$RDF$Literal = F3(
-	function (value, datatype, language) {
-		return {datatype: datatype, language: language, value: value};
-	});
-var $author$project$RDF$literal = F3(
-	function (value, datatype, maybeLanguage) {
-		return A3($author$project$RDF$Literal, value, datatype, maybeLanguage);
-	});
-var $elm$json$Json$Decode$map3 = _Json_map3;
-var $elm$json$Json$Decode$oneOf = _Json_oneOf;
-var $elm$json$Json$Decode$maybe = function (decoder) {
-	return $elm$json$Json$Decode$oneOf(
-		_List_fromArray(
-			[
-				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder),
-				$elm$json$Json$Decode$succeed($elm$core$Maybe$Nothing)
-			]));
-};
-var $author$project$RDF$objectBlankNode = function (bnode) {
-	return $author$project$RDF$NodeBlankNode(bnode);
-};
-var $author$project$RDF$objectIRI = function (i) {
-	return $author$project$RDF$NodeIRI(i);
-};
-var $author$project$RDF$NodeLiteral = function (a) {
-	return {$: 'NodeLiteral', a: a};
-};
-var $author$project$RDF$objectLiteral = function (l) {
-	return $author$project$RDF$NodeLiteral(l);
-};
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var $author$project$RDF$namespace = F2(
-	function (prefix, name) {
-		return $author$project$RDF$iri(
-			_Utils_ap(prefix, name));
-	});
-var $author$project$RDF$xsd = $author$project$RDF$namespace('http://www.w3.org/2001/XMLSchema#');
-var $author$project$RDF$JSON$valueObjectDecoder = A2(
-	$elm$json$Json$Decode$andThen,
-	function (type_) {
-		switch (type_) {
-			case 'uri':
-				return A2(
-					$elm$json$Json$Decode$map,
-					A2($elm$core$Basics$composeR, $author$project$RDF$iri, $author$project$RDF$objectIRI),
-					A2($elm$json$Json$Decode$field, 'value', $elm$json$Json$Decode$string));
-			case 'bnode':
-				return A2(
-					$elm$json$Json$Decode$map,
-					A2(
-						$elm$core$Basics$composeR,
-						$elm$core$String$dropLeft(2),
-						A2($elm$core$Basics$composeR, $author$project$RDF$blankNode, $author$project$RDF$objectBlankNode)),
-					A2($elm$json$Json$Decode$field, 'value', $elm$json$Json$Decode$string));
-			case 'literal':
-				return A2(
-					$elm$json$Json$Decode$map,
-					$author$project$RDF$objectLiteral,
-					A4(
-						$elm$json$Json$Decode$map3,
-						$author$project$RDF$literal,
-						A2($elm$json$Json$Decode$field, 'value', $elm$json$Json$Decode$string),
-						A2(
-							$elm$json$Json$Decode$map,
-							$elm$core$Maybe$withDefault(
-								$author$project$RDF$xsd('string')),
-							$elm$json$Json$Decode$maybe(
-								A2(
-									$elm$json$Json$Decode$map,
-									$author$project$RDF$iri,
-									A2($elm$json$Json$Decode$field, 'datatype', $elm$json$Json$Decode$string)))),
-						$elm$json$Json$Decode$maybe(
-							A2($elm$json$Json$Decode$field, 'lang', $elm$json$Json$Decode$string))));
-			default:
-				return $elm$json$Json$Decode$fail('Illegal type in value object (' + (type_ + ')'));
-		}
-	},
-	A2($elm$json$Json$Decode$field, 'type', $elm$json$Json$Decode$string));
-var $author$project$RDF$JSON$subjectObjectDecoder = A2(
-	$elm$json$Json$Decode$map,
-	$elm$core$List$concatMap(
-		function (_v0) {
-			var predicateKey = _v0.a;
-			var objects = _v0.b;
-			var predicate = $author$project$RDF$JSON$predicateDecoder(predicateKey);
-			return A2(
-				$elm$core$List$map,
-				function (object) {
-					return _Utils_Tuple2(predicate, object);
-				},
-				objects);
-		}),
-	$elm$json$Json$Decode$keyValuePairs(
-		$elm$json$Json$Decode$list($author$project$RDF$JSON$valueObjectDecoder)));
-var $author$project$RDF$triple = F3(
-	function (s, p, o) {
-		return {object: o, predicate: p, subject: s};
-	});
-var $author$project$RDF$JSON$subjectObjectToTriples = F2(
-	function (subject, subjectObject) {
-		return A2(
-			$elm$core$List$map,
-			function (_v0) {
-				var predicate = _v0.a;
-				var object = _v0.b;
-				return A3($author$project$RDF$triple, subject, predicate, object);
-			},
-			subjectObject);
-	});
-var $author$project$RDF$JSON$decoder = A2(
-	$elm$json$Json$Decode$map,
-	$author$project$RDF$fromList,
-	A2(
-		$elm$json$Json$Decode$map,
-		$elm$core$List$concatMap(
-			function (_v0) {
-				var subjectKey = _v0.a;
-				var subjectObject = _v0.b;
-				return A2(
-					$author$project$RDF$JSON$subjectObjectToTriples,
-					$author$project$RDF$JSON$subjectDecoder(subjectKey),
-					subjectObject);
-			}),
-		$elm$json$Json$Decode$keyValuePairs($author$project$RDF$JSON$subjectObjectDecoder)));
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $elm$http$Http$BadStatus_ = F2(
 	function (a, b) {
@@ -6084,6 +5896,11 @@ var $elm$core$Dict$update = F3(
 			return A2($elm$core$Dict$remove, targetKey, dictionary);
 		}
 	});
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
 var $elm$http$Http$expectStringResponse = F2(
 	function (toMsg, toResult) {
 		return A3(
@@ -6150,7 +5967,12 @@ var $elm$http$Http$expectJson = F2(
 						A2($elm$json$Json$Decode$decodeString, decoder, string));
 				}));
 	});
-var $elm$http$Http$emptyBody = _Http_emptyBody;
+var $elm$http$Http$Header = F2(
+	function (a, b) {
+		return {$: 'Header', a: a, b: b};
+	});
+var $elm$http$Http$header = $elm$http$Http$Header;
+var $elm$json$Json$Decode$list = _Json_decodeList;
 var $elm$http$Http$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -6319,24 +6141,33 @@ var $elm$http$Http$request = function (r) {
 		$elm$http$Http$Request(
 			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
 };
-var $elm$http$Http$get = function (r) {
-	return $elm$http$Http$request(
-		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
-};
-var $author$project$OpenEngiadina$publicUrl = 'https://ap-dev.miaengiadina.ch/public';
-var $author$project$OpenEngiadina$getNotes = $elm$http$Http$get(
+var $author$project$TalkToQUDT$someClasses = 'query=prefix+owl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23%3E%0Aprefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0A%0ASELECT+DISTINCT+%3Fclass+%3Flabel+%3Fdescription%0AWHERE+%7B%0A++%3Fclass+a+owl%3AClass.%0A++OPTIONAL+%7B+%3Fclass+rdfs%3Alabel+%3Flabel%7D%0A++OPTIONAL+%7B+%3Fclass+rdfs%3Acomment+%3Fdescription%7D%0A%7D%0ALIMIT+25';
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$http$Http$stringBody = _Http_pair;
+var $author$project$TalkToQUDT$getNotes = $elm$http$Http$request(
 	{
-		expect: A2($elm$http$Http$expectJson, $author$project$OpenEngiadina$Receive, $author$project$RDF$JSON$decoder),
-		url: $author$project$OpenEngiadina$publicUrl
+		body: A2($elm$http$Http$stringBody, 'application/x-www-form-urlencoded', $author$project$TalkToQUDT$someClasses),
+		expect: A2(
+			$elm$http$Http$expectJson,
+			$author$project$TalkToQUDT$GotQUDT,
+			$elm$json$Json$Decode$list($elm$json$Json$Decode$string)),
+		headers: _List_fromArray(
+			[
+				A2($elm$http$Http$header, 'Authorization', 'Basic')
+			]),
+		method: 'POST',
+		timeout: $elm$core$Maybe$Nothing,
+		tracker: $elm$core$Maybe$Nothing,
+		url: 'http://www.qudt.org/fuseki/qudt/query'
 	});
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $Fresheyeball$elm_return$Return$singleton = function (a) {
 	return _Utils_Tuple2(a, $elm$core$Platform$Cmd$none);
 };
-var $author$project$OpenEngiadina$init = function (flags) {
+var $author$project$TalkToQUDT$init = function (flags) {
 	return A2(
 		$Fresheyeball$elm_return$Return$command,
-		$author$project$OpenEngiadina$getNotes,
+		$author$project$TalkToQUDT$getNotes,
 		$Fresheyeball$elm_return$Return$singleton(
 			{
 				content: '',
@@ -6345,25 +6176,114 @@ var $author$project$OpenEngiadina$init = function (flags) {
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$OpenEngiadina$subscriptions = function (model) {
+var $author$project$TalkToQUDT$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
-var $author$project$OpenEngiadina$Refresh = {$: 'Refresh'};
+var $author$project$TalkToQUDT$Refresh = {$: 'Refresh'};
 var $elm$core$Basics$always = F2(
 	function (a, _v0) {
 		return a;
 	});
+var $elm$http$Http$expectBytesResponse = F2(
+	function (toMsg, toResult) {
+		return A3(
+			_Http_expect,
+			'arraybuffer',
+			_Http_toDataView,
+			A2($elm$core$Basics$composeR, toResult, toMsg));
+	});
+var $elm$http$Http$expectWhatever = function (toMsg) {
+	return A2(
+		$elm$http$Http$expectBytesResponse,
+		toMsg,
+		$elm$http$Http$resolve(
+			function (_v0) {
+				return $elm$core$Result$Ok(_Utils_Tuple0);
+			}));
+};
+var $author$project$TalkToQUDT$postNote = function (content) {
+	return $elm$http$Http$request(
+		{
+			body: A2($elm$http$Http$stringBody, 'application/rdf+json', content),
+			expect: $elm$http$Http$expectWhatever(
+				$elm$core$Basics$always($author$project$TalkToQUDT$Refresh)),
+			headers: _List_fromArray(
+				[
+					A2($elm$http$Http$header, 'Authorization', 'Basic')
+				]),
+			method: 'POST',
+			timeout: $elm$core$Maybe$Nothing,
+			tracker: $elm$core$Maybe$Nothing,
+			url: 'http://www.qudt.org/fuseki/qudt/query'
+		});
+};
+var $author$project$TalkToQUDT$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'Receive':
+				if (msg.a.$ === 'Ok') {
+					var graph = msg.a.a;
+					return $Fresheyeball$elm_return$Return$singleton(
+						function (graph_) {
+							return _Utils_update(
+								model,
+								{graph: graph_});
+						}(graph));
+				} else {
+					var e = msg.a.a;
+					return $Fresheyeball$elm_return$Return$singleton(model);
+				}
+			case 'UpdateContent':
+				var s = msg.a;
+				return $Fresheyeball$elm_return$Return$singleton(
+					_Utils_update(
+						model,
+						{content: s}));
+			case 'Post':
+				return A2(
+					$Fresheyeball$elm_return$Return$command,
+					$author$project$TalkToQUDT$postNote(model.content),
+					$Fresheyeball$elm_return$Return$singleton(model));
+			case 'Refresh':
+				return A2(
+					$Fresheyeball$elm_return$Return$command,
+					$author$project$TalkToQUDT$getNotes,
+					$Fresheyeball$elm_return$Return$singleton(model));
+			default:
+				var c = msg.a;
+				return $Fresheyeball$elm_return$Return$singleton(model);
+		}
+	});
+var $author$project$TalkToQUDT$Post = {$: 'Post'};
+var $author$project$TalkToQUDT$UpdateContent = function (a) {
+	return {$: 'UpdateContent', a: a};
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$html$Html$code = _VirtualDom_node('code');
+var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$RDF$Triple = F3(
 	function (subject, predicate, object) {
 		return {object: object, predicate: predicate, subject: subject};
 	});
-var $author$project$OpenEngiadina$activityStreams = $author$project$RDF$namespace('https://www.w3.org/ns/activitystreams#');
+var $author$project$RDF$iri = $elm$core$Basics$identity;
+var $author$project$RDF$namespace = F2(
+	function (prefix, name) {
+		return $author$project$RDF$iri(
+			_Utils_ap(prefix, name));
+	});
+var $author$project$TalkToQUDT$activityStreams = $author$project$RDF$namespace('https://www.w3.org/ns/activitystreams#');
 var $author$project$RDF$addTriple = F2(
 	function (triple_, _v0) {
 		var graph = _v0.a;
 		return $author$project$RDF$Graph(
 			A2($elm$core$List$cons, triple_, graph));
 	});
+var $author$project$RDF$BNode = function (a) {
+	return {$: 'BNode', a: a};
+};
+var $author$project$RDF$blankNode = function (id) {
+	return $author$project$RDF$BNode(id);
+};
 var $author$project$RDF$empty = $author$project$RDF$fromList(_List_Nil);
 var $author$project$RDF$blankNodeId = function (_v0) {
 	var id = _v0.a;
@@ -6651,10 +6571,43 @@ var $author$project$RDF$JSON$encode = function (graph) {
 			},
 			$author$project$RDF$subjects(graph)));
 };
+var $author$project$RDF$Literal = F3(
+	function (value, datatype, language) {
+		return {datatype: datatype, language: language, value: value};
+	});
+var $author$project$RDF$literal = F3(
+	function (value, datatype, maybeLanguage) {
+		return A3($author$project$RDF$Literal, value, datatype, maybeLanguage);
+	});
+var $author$project$RDF$NodeBlankNode = function (a) {
+	return {$: 'NodeBlankNode', a: a};
+};
+var $author$project$RDF$objectBlankNode = function (bnode) {
+	return $author$project$RDF$NodeBlankNode(bnode);
+};
+var $author$project$RDF$NodeIRI = function (a) {
+	return {$: 'NodeIRI', a: a};
+};
+var $author$project$RDF$objectIRI = function (i) {
+	return $author$project$RDF$NodeIRI(i);
+};
+var $author$project$RDF$NodeLiteral = function (a) {
+	return {$: 'NodeLiteral', a: a};
+};
+var $author$project$RDF$objectLiteral = function (l) {
+	return $author$project$RDF$NodeLiteral(l);
+};
+var $author$project$RDF$predicateIRI = function (i) {
+	return $author$project$RDF$NodeIRI(i);
+};
+var $author$project$RDF$subjectBlankNode = function (bnode) {
+	return $author$project$RDF$NodeBlankNode(bnode);
+};
 var $author$project$RDF$rdf = $author$project$RDF$namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
 var $author$project$RDF$type_ = $author$project$RDF$predicateIRI(
 	$author$project$RDF$rdf('type'));
-var $author$project$OpenEngiadina$encodeNote = function (content) {
+var $author$project$RDF$xsd = $author$project$RDF$namespace('http://www.w3.org/2001/XMLSchema#');
+var $author$project$TalkToQUDT$encodeNote = function (content) {
 	var object_id = $author$project$RDF$blankNode('object');
 	var activity_id = $author$project$RDF$subjectBlankNode(
 		$author$project$RDF$blankNode('activity'));
@@ -6668,7 +6621,7 @@ var $author$project$OpenEngiadina$encodeNote = function (content) {
 					$author$project$RDF$Triple,
 					$author$project$RDF$subjectBlankNode(object_id),
 					$author$project$RDF$predicateIRI(
-						$author$project$OpenEngiadina$activityStreams('content')),
+						$author$project$TalkToQUDT$activityStreams('content')),
 					$author$project$RDF$objectLiteral(
 						A3(
 							$author$project$RDF$literal,
@@ -6682,14 +6635,14 @@ var $author$project$OpenEngiadina$encodeNote = function (content) {
 						$author$project$RDF$subjectBlankNode(object_id),
 						$author$project$RDF$type_,
 						$author$project$RDF$objectIRI(
-							$author$project$OpenEngiadina$activityStreams('Note'))),
+							$author$project$TalkToQUDT$activityStreams('Note'))),
 					A2(
 						$author$project$RDF$addTriple,
 						A3(
 							$author$project$RDF$Triple,
 							activity_id,
 							$author$project$RDF$predicateIRI(
-								$author$project$OpenEngiadina$activityStreams('object')),
+								$author$project$TalkToQUDT$activityStreams('object')),
 							$author$project$RDF$objectBlankNode(object_id)),
 						A2(
 							$author$project$RDF$addTriple,
@@ -6697,16 +6650,16 @@ var $author$project$OpenEngiadina$encodeNote = function (content) {
 								$author$project$RDF$Triple,
 								activity_id,
 								$author$project$RDF$predicateIRI(
-									$author$project$OpenEngiadina$activityStreams('to')),
+									$author$project$TalkToQUDT$activityStreams('to')),
 								$author$project$RDF$objectIRI(
-									$author$project$OpenEngiadina$activityStreams('Public'))),
+									$author$project$TalkToQUDT$activityStreams('Public'))),
 							A2(
 								$author$project$RDF$addTriple,
 								A3(
 									$author$project$RDF$Triple,
 									activity_id,
 									$author$project$RDF$predicateIRI(
-										$author$project$OpenEngiadina$activityStreams('to')),
+										$author$project$TalkToQUDT$activityStreams('to')),
 									$author$project$RDF$objectIRI('http://localhost:4000/users/alice')),
 								A2(
 									$author$project$RDF$addTriple,
@@ -6715,92 +6668,9 @@ var $author$project$OpenEngiadina$encodeNote = function (content) {
 										activity_id,
 										$author$project$RDF$type_,
 										$author$project$RDF$objectIRI(
-											$author$project$OpenEngiadina$activityStreams('Create'))),
+											$author$project$TalkToQUDT$activityStreams('Create'))),
 									$author$project$RDF$empty))))))));
 };
-var $elm$http$Http$expectBytesResponse = F2(
-	function (toMsg, toResult) {
-		return A3(
-			_Http_expect,
-			'arraybuffer',
-			_Http_toDataView,
-			A2($elm$core$Basics$composeR, toResult, toMsg));
-	});
-var $elm$http$Http$expectWhatever = function (toMsg) {
-	return A2(
-		$elm$http$Http$expectBytesResponse,
-		toMsg,
-		$elm$http$Http$resolve(
-			function (_v0) {
-				return $elm$core$Result$Ok(_Utils_Tuple0);
-			}));
-};
-var $elm$http$Http$Header = F2(
-	function (a, b) {
-		return {$: 'Header', a: a, b: b};
-	});
-var $elm$http$Http$header = $elm$http$Http$Header;
-var $elm$http$Http$stringBody = _Http_pair;
-var $author$project$OpenEngiadina$postNote = function (content) {
-	return $elm$http$Http$request(
-		{
-			body: A2(
-				$elm$http$Http$stringBody,
-				'application/rdf+json',
-				$author$project$OpenEngiadina$encodeNote(content)),
-			expect: $elm$http$Http$expectWhatever(
-				$elm$core$Basics$always($author$project$OpenEngiadina$Refresh)),
-			headers: _List_fromArray(
-				[
-					A2($elm$http$Http$header, 'Authorization', 'Basic YWxpY2U6MTIz')
-				]),
-			method: 'POST',
-			timeout: $elm$core$Maybe$Nothing,
-			tracker: $elm$core$Maybe$Nothing,
-			url: 'http://localhost:4000/users/alice/outbox'
-		});
-};
-var $author$project$OpenEngiadina$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'Receive':
-				if (msg.a.$ === 'Ok') {
-					var graph = msg.a.a;
-					return $Fresheyeball$elm_return$Return$singleton(
-						function (graph_) {
-							return _Utils_update(
-								model,
-								{graph: graph_});
-						}(graph));
-				} else {
-					var e = msg.a.a;
-					return $Fresheyeball$elm_return$Return$singleton(model);
-				}
-			case 'UpdateContent':
-				var s = msg.a;
-				return $Fresheyeball$elm_return$Return$singleton(
-					_Utils_update(
-						model,
-						{content: s}));
-			case 'Post':
-				return A2(
-					$Fresheyeball$elm_return$Return$command,
-					$author$project$OpenEngiadina$postNote(model.content),
-					$Fresheyeball$elm_return$Return$singleton(model));
-			default:
-				return A2(
-					$Fresheyeball$elm_return$Return$command,
-					$author$project$OpenEngiadina$getNotes,
-					$Fresheyeball$elm_return$Return$singleton(model));
-		}
-	});
-var $author$project$OpenEngiadina$Post = {$: 'Post'};
-var $author$project$OpenEngiadina$UpdateContent = function (a) {
-	return {$: 'UpdateContent', a: a};
-};
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$html$Html$code = _VirtualDom_node('code');
-var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
@@ -6832,6 +6702,7 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
@@ -6862,7 +6733,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$OpenEngiadina$composeNote = function (content) {
+var $author$project$TalkToQUDT$composeNote = function (content) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -6873,14 +6744,14 @@ var $author$project$OpenEngiadina$composeNote = function (content) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$value(content),
-						$elm$html$Html$Events$onInput($author$project$OpenEngiadina$UpdateContent)
+						$elm$html$Html$Events$onInput($author$project$TalkToQUDT$UpdateContent)
 					]),
 				_List_Nil),
 				A2(
 				$elm$html$Html$button,
 				_List_fromArray(
 					[
-						$elm$html$Html$Events$onClick($author$project$OpenEngiadina$Post)
+						$elm$html$Html$Events$onClick($author$project$TalkToQUDT$Post)
 					]),
 				_List_fromArray(
 					[
@@ -6904,7 +6775,7 @@ var $author$project$OpenEngiadina$composeNote = function (content) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								$author$project$OpenEngiadina$encodeNote(content))
+								$author$project$TalkToQUDT$encodeNote(content))
 							]))
 					]))
 			]));
@@ -6913,376 +6784,7 @@ var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$header = _VirtualDom_node('header');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
-var $author$project$RDF$Decode$State = F2(
-	function (graph, node) {
-		return {graph: graph, node: node};
-	});
-var $author$project$RDF$asNode = function (node) {
-	switch (node.$) {
-		case 'NodeIRI':
-			var iri_ = node.a;
-			return $author$project$RDF$NodeIRI(iri_);
-		case 'NodeBlankNode':
-			var bnode_ = node.a;
-			return $author$project$RDF$NodeBlankNode(bnode_);
-		default:
-			var literal_ = node.a;
-			return $author$project$RDF$NodeLiteral(literal_);
-	}
-};
-var $elm$core$Result$map = F2(
-	function (func, ra) {
-		if (ra.$ === 'Ok') {
-			var a = ra.a;
-			return $elm$core$Result$Ok(
-				func(a));
-		} else {
-			var e = ra.a;
-			return $elm$core$Result$Err(e);
-		}
-	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $author$project$RDF$Decode$decode = F3(
-	function (_v0, graph, node) {
-		var f = _v0.a;
-		return A2(
-			$elm$core$Result$map,
-			$elm$core$Tuple$second,
-			f(
-				A2(
-					$author$project$RDF$Decode$State,
-					graph,
-					$author$project$RDF$asNode(node))));
-	});
-var $elm$core$Result$toMaybe = function (result) {
-	if (result.$ === 'Ok') {
-		var v = result.a;
-		return $elm$core$Maybe$Just(v);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$RDF$Decode$decodeAll = F2(
-	function (decoder, graph) {
-		return A2(
-			$elm$core$List$filterMap,
-			function (subject) {
-				return $elm$core$Result$toMaybe(
-					A3($author$project$RDF$Decode$decode, decoder, graph, subject));
-			},
-			$author$project$RDF$subjects(graph));
-	});
-var $author$project$OpenEngiadina$Note = F3(
-	function (iri, content, context) {
-		return {content: content, context: context, iri: iri};
-	});
-var $author$project$RDF$Decode$Decoder = function (a) {
-	return {$: 'Decoder', a: a};
-};
-var $elm$core$Result$andThen = F2(
-	function (callback, result) {
-		if (result.$ === 'Ok') {
-			var value = result.a;
-			return callback(value);
-		} else {
-			var msg = result.a;
-			return $elm$core$Result$Err(msg);
-		}
-	});
-var $author$project$RDF$Decode$andThen = F2(
-	function (f, _v0) {
-		var decoderA = _v0.a;
-		return $author$project$RDF$Decode$Decoder(
-			function (state1) {
-				return A2(
-					$elm$core$Result$andThen,
-					function (_v1) {
-						var state2 = _v1.a;
-						var a = _v1.b;
-						var _v2 = f(a);
-						var decoderB = _v2.a;
-						return decoderB(state2);
-					},
-					decoderA(state1));
-			});
-	});
-var $author$project$RDF$Decode$succeed = function (a) {
-	return $author$project$RDF$Decode$Decoder(
-		function (state) {
-			return $elm$core$Result$Ok(
-				_Utils_Tuple2(state, a));
-		});
-};
-var $author$project$RDF$Decode$map = function (f) {
-	return $author$project$RDF$Decode$andThen(
-		A2($elm$core$Basics$composeR, f, $author$project$RDF$Decode$succeed));
-};
-var $author$project$RDF$Decode$map2 = F3(
-	function (f, decoderA, decoderB) {
-		return A2(
-			$author$project$RDF$Decode$andThen,
-			function (a) {
-				return A2(
-					$author$project$RDF$Decode$map,
-					f(a),
-					decoderB);
-			},
-			decoderA);
-	});
-var $author$project$RDF$Decode$apply = F2(
-	function (decoderA, decoderF) {
-		return A3(
-			$author$project$RDF$Decode$map2,
-			F2(
-				function (f, a) {
-					return f(a);
-				}),
-			decoderF,
-			decoderA);
-	});
-var $author$project$RDF$Decode$fail = function (msg) {
-	return $author$project$RDF$Decode$Decoder(
-		function (_v0) {
-			return $elm$core$Result$Err(msg);
-		});
-};
-var $author$project$RDF$asIRI = function (node) {
-	if (node.$ === 'NodeIRI') {
-		var iri_ = node.a;
-		return $elm$core$Maybe$Just(iri_);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$RDF$Decode$iriDecoder = $author$project$RDF$Decode$Decoder(
-	function (state) {
-		var _v0 = $author$project$RDF$asIRI(state.node);
-		if (_v0.$ === 'Just') {
-			var iri = _v0.a;
-			return $elm$core$Result$Ok(
-				_Utils_Tuple2(state, iri));
-		} else {
-			return $elm$core$Result$Err('expecting iri');
-		}
-	});
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
-		return true;
-	} else {
-		return false;
-	}
-};
-var $author$project$RDF$asSubject = function (node) {
-	switch (node.$) {
-		case 'NodeIRI':
-			var i = node.a;
-			return $elm$core$Maybe$Just(
-				$author$project$RDF$NodeIRI(i));
-		case 'NodeBlankNode':
-			var bnode = node.a;
-			return $elm$core$Maybe$Just(
-				$author$project$RDF$NodeBlankNode(bnode));
-		default:
-			return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
-	});
-var $author$project$RDF$Decode$objectsDecoder = F2(
-	function (p, _v0) {
-		var od = _v0.a;
-		return $author$project$RDF$Decode$Decoder(
-			function (state) {
-				var decodeObjects = function (object) {
-					return od(
-						_Utils_update(
-							state,
-							{
-								node: $author$project$RDF$asNode(object)
-							}));
-				};
-				var _v1 = $author$project$RDF$asSubject(state.node);
-				if (_v1.$ === 'Just') {
-					var subject = _v1.a;
-					return $elm$core$Result$Ok(
-						A2(
-							$elm$core$Tuple$pair,
-							state,
-							A2(
-								$elm$core$List$map,
-								$elm$core$Tuple$second,
-								A2(
-									$elm$core$List$filterMap,
-									$elm$core$Result$toMaybe,
-									A2(
-										$elm$core$List$map,
-										decodeObjects,
-										A3($author$project$RDF$graphGetObjects, state.graph, subject, p))))));
-				} else {
-					return $elm$core$Result$Err('expecting IRI or BlankNode, got Literal');
-				}
-			});
-	});
-var $author$project$RDF$Decode$ensureType = function (iri) {
-	return A2(
-		$author$project$RDF$Decode$andThen,
-		function (matchingTypes) {
-			return $elm$core$List$isEmpty(matchingTypes) ? $author$project$RDF$Decode$fail('not of type') : $author$project$RDF$Decode$succeed(_Utils_Tuple0);
-		},
-		A2(
-			$author$project$RDF$Decode$objectsDecoder,
-			$author$project$RDF$type_,
-			A2(
-				$author$project$RDF$Decode$andThen,
-				function (typeIRI) {
-					return _Utils_eq(typeIRI, iri) ? $author$project$RDF$Decode$succeed(iri) : $author$project$RDF$Decode$fail('iri does not match');
-				},
-				$author$project$RDF$Decode$iriDecoder)));
-};
-var $author$project$RDF$Decode$first = function (decoder) {
-	return A2(
-		$author$project$RDF$Decode$andThen,
-		function (lst) {
-			if (!lst.b) {
-				return $author$project$RDF$Decode$fail('Can not get first element from empty list.');
-			} else {
-				var fst = lst.a;
-				return $author$project$RDF$Decode$succeed(fst);
-			}
-		},
-		decoder);
-};
-var $author$project$RDF$Decode$ignore = F2(
-	function (decoderB, decoderA) {
-		return A3(
-			$author$project$RDF$Decode$map2,
-			F2(
-				function (a, _v0) {
-					return a;
-				}),
-			decoderA,
-			decoderB);
-	});
-var $author$project$RDF$asLiteral = function (node) {
-	if (node.$ === 'NodeLiteral') {
-		var literal_ = node.a;
-		return $elm$core$Maybe$Just(literal_);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$RDF$Decode$literalDecoder = $author$project$RDF$Decode$Decoder(
-	function (state) {
-		var _v0 = $author$project$RDF$asLiteral(state.node);
-		if (_v0.$ === 'Just') {
-			var literal = _v0.a;
-			return $elm$core$Result$Ok(
-				_Utils_Tuple2(state, literal));
-		} else {
-			return $elm$core$Result$Err('expecting literal');
-		}
-	});
-var $author$project$RDF$Decode$maybe = function (_v0) {
-	var decoderA = _v0.a;
-	return $author$project$RDF$Decode$Decoder(
-		function (state) {
-			var _v1 = decoderA(state);
-			if (_v1.$ === 'Ok') {
-				var _v2 = _v1.a;
-				var state_ = _v2.a;
-				var a = _v2.b;
-				return $elm$core$Result$Ok(
-					_Utils_Tuple2(
-						state_,
-						$elm$core$Maybe$Just(a)));
-			} else {
-				return $elm$core$Result$Ok(
-					_Utils_Tuple2(state, $elm$core$Maybe$Nothing));
-			}
-		});
-};
-var $author$project$OpenEngiadina$noteDecoder = A2(
-	$author$project$RDF$Decode$apply,
-	$author$project$RDF$Decode$maybe(
-		$author$project$RDF$Decode$first(
-			A2(
-				$author$project$RDF$Decode$objectsDecoder,
-				$author$project$RDF$predicateIRI(
-					$author$project$OpenEngiadina$activityStreams('context')),
-				$author$project$RDF$Decode$iriDecoder))),
-	A2(
-		$author$project$RDF$Decode$apply,
-		$author$project$RDF$Decode$first(
-			A2(
-				$author$project$RDF$Decode$objectsDecoder,
-				$author$project$RDF$predicateIRI(
-					$author$project$OpenEngiadina$activityStreams('content')),
-				$author$project$RDF$Decode$literalDecoder)),
-		A2(
-			$author$project$RDF$Decode$apply,
-			$author$project$RDF$Decode$iriDecoder,
-			A2(
-				$author$project$RDF$Decode$ignore,
-				$author$project$RDF$Decode$ensureType(
-					$author$project$OpenEngiadina$activityStreams('Note')),
-				$author$project$RDF$Decode$succeed($author$project$OpenEngiadina$Note)))));
-var $author$project$OpenEngiadina$getNotesFromGraph = function (graph) {
-	return A2($author$project$RDF$Decode$decodeAll, $author$project$OpenEngiadina$noteDecoder, graph);
-};
-var $elm$html$Html$a = _VirtualDom_node('a');
-var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $elm$html$Html$Attributes$href = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'href',
-		_VirtualDom_noJavaScriptUri(url));
-};
-var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
-var $author$project$OpenEngiadina$noteView = function (note) {
-	return A2(
-		$elm$html$Html$div,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$a,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$href(note.iri),
-						$elm$html$Html$Attributes$target('_blank')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h3,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text(note.iri)
-							]))
-					])),
-				A2(
-				$elm$html$Html$pre,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(note.content.value)
-					]))
-			]));
-};
-var $author$project$OpenEngiadina$notesView = function (graph) {
-	var notes = $author$project$OpenEngiadina$getNotesFromGraph(graph);
-	return A2(
-		$elm$html$Html$div,
-		_List_Nil,
-		A2($elm$core$List$map, $author$project$OpenEngiadina$noteView, notes));
-};
-var $author$project$OpenEngiadina$view = function (model) {
+var $author$project$TalkToQUDT$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
@@ -7296,14 +6798,14 @@ var $author$project$OpenEngiadina$view = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Notes from openEngiadina')
+								$elm$html$Html$text('Talk to QUDT')
 							])),
 						A2(
 						$elm$html$Html$p,
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('This is a small example app that fetches public ActivityPub Notes from an ActivityPub server at https://openengiadina.net/')
+								$elm$html$Html$text('This is a small example app that queries QUDT')
 							]))
 					])),
 				A2(
@@ -7316,29 +6818,21 @@ var $author$project$OpenEngiadina$view = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Compose')
+								$elm$html$Html$text('Query')
 							])),
-						$author$project$OpenEngiadina$composeNote(model.content),
-						A2(
-						$elm$html$Html$h2,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Notes')
-							])),
-						$author$project$OpenEngiadina$notesView(model.graph)
+						$author$project$TalkToQUDT$composeNote(model.content)
 					]))
 			]),
-		title: 'Notes from openEngiadina'
+		title: 'Talk to QUDT'
 	};
 };
-var $author$project$OpenEngiadina$main = $elm$browser$Browser$document(
-	{init: $author$project$OpenEngiadina$init, subscriptions: $author$project$OpenEngiadina$subscriptions, update: $author$project$OpenEngiadina$update, view: $author$project$OpenEngiadina$view});
-_Platform_export({'OpenEngiadina':{'init':$author$project$OpenEngiadina$main(
+var $author$project$TalkToQUDT$main = $elm$browser$Browser$document(
+	{init: $author$project$TalkToQUDT$init, subscriptions: $author$project$TalkToQUDT$subscriptions, update: $author$project$TalkToQUDT$update, view: $author$project$TalkToQUDT$view});
+_Platform_export({'TalkToQUDT':{'init':$author$project$TalkToQUDT$main(
 	$elm$json$Json$Decode$succeed(
 		{}))(0)}});}(this));
 
-  var app = Elm.OpenEngiadina.init({ node: document.getElementById("elm") });
+  var app = Elm.TalkToQUDT.init({ node: document.getElementById("elm") });
 }
 catch (e)
 {
