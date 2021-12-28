@@ -117,10 +117,6 @@ init flags =
         |> Return.singleton
 
 
-
--- |> Return.command (queryEndpoint queryClasses)
-
-
 queryEndpoint : SPARQLquery -> Cmd Msg
 queryEndpoint query =
     Http.request
