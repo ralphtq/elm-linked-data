@@ -4371,6 +4371,23 @@ function _Browser_load(url)
 }
 
 
+function _Url_percentEncode(string)
+{
+	return encodeURIComponent(string);
+}
+
+function _Url_percentDecode(string)
+{
+	try
+	{
+		return $elm$core$Maybe$Just(decodeURIComponent(string));
+	}
+	catch (e)
+	{
+		return $elm$core$Maybe$Nothing;
+	}
+}
+
 
 // SEND REQUEST
 
@@ -5333,7 +5350,30 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$document = _Browser_document;
+var $author$project$RDF$Graph = function (a) {
+	return {$: 'Graph', a: a};
+};
+var $author$project$RDF$fromList = function (ts) {
+	return $author$project$RDF$Graph(ts);
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $Fresheyeball$elm_return$Return$singleton = function (a) {
+	return _Utils_Tuple2(a, $elm$core$Platform$Cmd$none);
+};
+var $author$project$TalkToQUDT$init = function (flags) {
+	return $Fresheyeball$elm_return$Return$singleton(
+		{
+			content: '',
+			graph: $author$project$RDF$fromList(_List_Nil),
+			query: ''
+		});
+};
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$TalkToQUDT$subscriptions = function (model) {
+	return $elm$core$Platform$Sub$none;
+};
 var $Fresheyeball$elm_return$Return$command = F2(
 	function (cmd, _v0) {
 		var model = _v0.a;
@@ -5344,16 +5384,33 @@ var $Fresheyeball$elm_return$Return$command = F2(
 				_List_fromArray(
 					[cmd, cmd_])));
 	});
-var $author$project$RDF$Graph = function (a) {
-	return {$: 'Graph', a: a};
+var $elm$url$Url$percentEncode = _Url_percentEncode;
+var $author$project$TalkToQUDT$prefixForOWL = $elm$url$Url$percentEncode('prefix owl:  <http://www.w3.org/2002/07/owl#>');
+var $author$project$TalkToQUDT$prefixForRDFS = $elm$url$Url$percentEncode('prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>');
+var $author$project$TalkToQUDT$encodedPrefixes = _Utils_ap($author$project$TalkToQUDT$prefixForOWL, $author$project$TalkToQUDT$prefixForRDFS);
+var $author$project$TalkToQUDT$queryQUDTclasses = '\n SELECT ?class ?label ?description\n WHERE {\n     ?class a owl:Class .\n     OPTIONAL {?class rdfs:label ?label}\n     OPTIONAL {?class rdfs:comment ?description}\n }\n ';
+var $elm$core$String$replace = F3(
+	function (before, after, string) {
+		return A2(
+			$elm$core$String$join,
+			after,
+			A2($elm$core$String$split, before, string));
+	});
+var $author$project$TalkToQUDT$sparqlQuery = F2(
+	function (query, max) {
+		return query + ('LIMIT' + $elm$core$String$fromInt(max));
+	});
+var $author$project$TalkToQUDT$queryClasses = _Utils_ap(
+	$author$project$TalkToQUDT$encodedPrefixes,
+	A3(
+		$elm$core$String$replace,
+		'%20',
+		'+',
+		$elm$url$Url$percentEncode(
+			A2($author$project$TalkToQUDT$sparqlQuery, $author$project$TalkToQUDT$queryQUDTclasses, 10))));
+var $author$project$TalkToQUDT$GotQueryResponse = function (a) {
+	return {$: 'GotQueryResponse', a: a};
 };
-var $author$project$RDF$fromList = function (ts) {
-	return $author$project$RDF$Graph(ts);
-};
-var $author$project$TalkToQUDT$GotQUDT = function (a) {
-	return {$: 'GotQUDT', a: a};
-};
-var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $elm$http$Http$BadStatus_ = F2(
 	function (a, b) {
 		return {$: 'BadStatus_', a: a, b: b};
@@ -5909,17 +5966,6 @@ var $elm$http$Http$expectStringResponse = F2(
 			$elm$core$Basics$identity,
 			A2($elm$core$Basics$composeR, toResult, toMsg));
 	});
-var $elm$core$Result$mapError = F2(
-	function (f, result) {
-		if (result.$ === 'Ok') {
-			var v = result.a;
-			return $elm$core$Result$Ok(v);
-		} else {
-			var e = result.a;
-			return $elm$core$Result$Err(
-				f(e));
-		}
-	});
 var $elm$http$Http$BadBody = function (a) {
 	return {$: 'BadBody', a: a};
 };
@@ -5931,6 +5977,17 @@ var $elm$http$Http$BadUrl = function (a) {
 };
 var $elm$http$Http$NetworkError = {$: 'NetworkError'};
 var $elm$http$Http$Timeout = {$: 'Timeout'};
+var $elm$core$Result$mapError = F2(
+	function (f, result) {
+		if (result.$ === 'Ok') {
+			var v = result.a;
+			return $elm$core$Result$Ok(v);
+		} else {
+			var e = result.a;
+			return $elm$core$Result$Err(
+				f(e));
+		}
+	});
 var $elm$http$Http$resolve = F2(
 	function (toResult, response) {
 		switch (response.$) {
@@ -5954,25 +6011,17 @@ var $elm$http$Http$resolve = F2(
 					toResult(body));
 		}
 	});
-var $elm$http$Http$expectJson = F2(
-	function (toMsg, decoder) {
-		return A2(
-			$elm$http$Http$expectStringResponse,
-			toMsg,
-			$elm$http$Http$resolve(
-				function (string) {
-					return A2(
-						$elm$core$Result$mapError,
-						$elm$json$Json$Decode$errorToString,
-						A2($elm$json$Json$Decode$decodeString, decoder, string));
-				}));
-	});
+var $elm$http$Http$expectString = function (toMsg) {
+	return A2(
+		$elm$http$Http$expectStringResponse,
+		toMsg,
+		$elm$http$Http$resolve($elm$core$Result$Ok));
+};
 var $elm$http$Http$Header = F2(
 	function (a, b) {
 		return {$: 'Header', a: a, b: b};
 	});
 var $elm$http$Http$header = $elm$http$Http$Header;
-var $elm$json$Json$Decode$list = _Json_decodeList;
 var $elm$http$Http$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -6141,72 +6190,12 @@ var $elm$http$Http$request = function (r) {
 		$elm$http$Http$Request(
 			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
 };
-var $author$project$TalkToQUDT$someClasses = 'query=prefix+owl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23%3E%0Aprefix+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0A%0ASELECT+DISTINCT+%3Fclass+%3Flabel+%3Fdescription%0AWHERE+%7B%0A++%3Fclass+a+owl%3AClass.%0A++OPTIONAL+%7B+%3Fclass+rdfs%3Alabel+%3Flabel%7D%0A++OPTIONAL+%7B+%3Fclass+rdfs%3Acomment+%3Fdescription%7D%0A%7D%0ALIMIT+25';
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $elm$http$Http$stringBody = _Http_pair;
-var $author$project$TalkToQUDT$getNotes = $elm$http$Http$request(
-	{
-		body: A2($elm$http$Http$stringBody, 'application/x-www-form-urlencoded', $author$project$TalkToQUDT$someClasses),
-		expect: A2(
-			$elm$http$Http$expectJson,
-			$author$project$TalkToQUDT$GotQUDT,
-			$elm$json$Json$Decode$list($elm$json$Json$Decode$string)),
-		headers: _List_fromArray(
-			[
-				A2($elm$http$Http$header, 'Authorization', 'Basic')
-			]),
-		method: 'POST',
-		timeout: $elm$core$Maybe$Nothing,
-		tracker: $elm$core$Maybe$Nothing,
-		url: 'http://www.qudt.org/fuseki/qudt/query'
-	});
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $Fresheyeball$elm_return$Return$singleton = function (a) {
-	return _Utils_Tuple2(a, $elm$core$Platform$Cmd$none);
-};
-var $author$project$TalkToQUDT$init = function (flags) {
-	return A2(
-		$Fresheyeball$elm_return$Return$command,
-		$author$project$TalkToQUDT$getNotes,
-		$Fresheyeball$elm_return$Return$singleton(
-			{
-				content: '',
-				graph: $author$project$RDF$fromList(_List_Nil)
-			}));
-};
-var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$TalkToQUDT$subscriptions = function (model) {
-	return $elm$core$Platform$Sub$none;
-};
-var $author$project$TalkToQUDT$Refresh = {$: 'Refresh'};
-var $elm$core$Basics$always = F2(
-	function (a, _v0) {
-		return a;
-	});
-var $elm$http$Http$expectBytesResponse = F2(
-	function (toMsg, toResult) {
-		return A3(
-			_Http_expect,
-			'arraybuffer',
-			_Http_toDataView,
-			A2($elm$core$Basics$composeR, toResult, toMsg));
-	});
-var $elm$http$Http$expectWhatever = function (toMsg) {
-	return A2(
-		$elm$http$Http$expectBytesResponse,
-		toMsg,
-		$elm$http$Http$resolve(
-			function (_v0) {
-				return $elm$core$Result$Ok(_Utils_Tuple0);
-			}));
-};
-var $author$project$TalkToQUDT$postNote = function (content) {
+var $author$project$TalkToQUDT$queryEndpoint = function (query) {
 	return $elm$http$Http$request(
 		{
-			body: A2($elm$http$Http$stringBody, 'application/rdf+json', content),
-			expect: $elm$http$Http$expectWhatever(
-				$elm$core$Basics$always($author$project$TalkToQUDT$Refresh)),
+			body: A2($elm$http$Http$stringBody, 'application/x-www-form-urlencoded', 'query=' + query),
+			expect: $elm$http$Http$expectString($author$project$TalkToQUDT$GotQueryResponse),
 			headers: _List_fromArray(
 				[
 					A2($elm$http$Http$header, 'Authorization', 'Basic')
@@ -6217,6 +6206,15 @@ var $author$project$TalkToQUDT$postNote = function (content) {
 			url: 'http://www.qudt.org/fuseki/qudt/query'
 		});
 };
+var $author$project$TalkToQUDT$queryQUDTtriples = '\n SELECT ?subject ?predicate ?object\n WHERE {\n   ?subject ?predicate ?object\n }\n ';
+var $author$project$TalkToQUDT$queryTriples = _Utils_ap(
+	$author$project$TalkToQUDT$encodedPrefixes,
+	A3(
+		$elm$core$String$replace,
+		'%20',
+		'+',
+		$elm$url$Url$percentEncode(
+			A2($author$project$TalkToQUDT$sparqlQuery, $author$project$TalkToQUDT$queryQUDTtriples, 10))));
 var $author$project$TalkToQUDT$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6239,439 +6237,47 @@ var $author$project$TalkToQUDT$update = F2(
 					_Utils_update(
 						model,
 						{content: s}));
-			case 'Post':
+			case 'QueryClasses':
 				return A2(
 					$Fresheyeball$elm_return$Return$command,
-					$author$project$TalkToQUDT$postNote(model.content),
-					$Fresheyeball$elm_return$Return$singleton(model));
+					$author$project$TalkToQUDT$queryEndpoint($author$project$TalkToQUDT$queryClasses),
+					$Fresheyeball$elm_return$Return$singleton(
+						_Utils_update(
+							model,
+							{query: $author$project$TalkToQUDT$queryClasses})));
+			case 'QueryTriples':
+				return A2(
+					$Fresheyeball$elm_return$Return$command,
+					$author$project$TalkToQUDT$queryEndpoint($author$project$TalkToQUDT$queryTriples),
+					$Fresheyeball$elm_return$Return$singleton(
+						_Utils_update(
+							model,
+							{query: $author$project$TalkToQUDT$queryTriples})));
 			case 'Refresh':
 				return A2(
 					$Fresheyeball$elm_return$Return$command,
-					$author$project$TalkToQUDT$getNotes,
+					$author$project$TalkToQUDT$queryEndpoint($author$project$TalkToQUDT$queryClasses),
 					$Fresheyeball$elm_return$Return$singleton(model));
 			default:
-				var c = msg.a;
-				return $Fresheyeball$elm_return$Return$singleton(model);
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var response = result.a;
+					return $Fresheyeball$elm_return$Return$singleton(
+						_Utils_update(
+							model,
+							{content: response}));
+				} else {
+					return $Fresheyeball$elm_return$Return$singleton(model);
+				}
 		}
 	});
-var $author$project$TalkToQUDT$Post = {$: 'Post'};
-var $author$project$TalkToQUDT$UpdateContent = function (a) {
-	return {$: 'UpdateContent', a: a};
-};
+var $author$project$TalkToQUDT$QueryClasses = {$: 'QueryClasses'};
+var $author$project$TalkToQUDT$QueryTriples = {$: 'QueryTriples'};
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$html$Html$code = _VirtualDom_node('code');
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$RDF$Triple = F3(
-	function (subject, predicate, object) {
-		return {object: object, predicate: predicate, subject: subject};
-	});
-var $author$project$RDF$iri = $elm$core$Basics$identity;
-var $author$project$RDF$namespace = F2(
-	function (prefix, name) {
-		return $author$project$RDF$iri(
-			_Utils_ap(prefix, name));
-	});
-var $author$project$TalkToQUDT$activityStreams = $author$project$RDF$namespace('https://www.w3.org/ns/activitystreams#');
-var $author$project$RDF$addTriple = F2(
-	function (triple_, _v0) {
-		var graph = _v0.a;
-		return $author$project$RDF$Graph(
-			A2($elm$core$List$cons, triple_, graph));
-	});
-var $author$project$RDF$BNode = function (a) {
-	return {$: 'BNode', a: a};
-};
-var $author$project$RDF$blankNode = function (id) {
-	return $author$project$RDF$BNode(id);
-};
-var $author$project$RDF$empty = $author$project$RDF$fromList(_List_Nil);
-var $author$project$RDF$blankNodeId = function (_v0) {
-	var id = _v0.a;
-	return id;
-};
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $author$project$RDF$mapNode = F4(
-	function (node, fIRI, fBlankNode, fLiteral) {
-		switch (node.$) {
-			case 'NodeIRI':
-				var iri_ = node.a;
-				return fIRI(iri_);
-			case 'NodeBlankNode':
-				var bnode_ = node.a;
-				return fBlankNode(bnode_);
-			default:
-				var literal_ = node.a;
-				return fLiteral(literal_);
-		}
-	});
-var $author$project$RDF$mapObject = $author$project$RDF$mapNode;
-var $elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
-		A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v0, obj) {
-					var k = _v0.a;
-					var v = _v0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(_Utils_Tuple0),
-			pairs));
-};
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$RDF$JSON$encodeObject = function (object) {
-	return A4(
-		$author$project$RDF$mapObject,
-		object,
-		function (iri) {
-			return $elm$json$Json$Encode$object(
-				_List_fromArray(
-					[
-						_Utils_Tuple2(
-						'type',
-						$elm$json$Json$Encode$string('uri')),
-						_Utils_Tuple2(
-						'value',
-						$elm$json$Json$Encode$string(iri))
-					]));
-		},
-		function (bnode) {
-			return $elm$json$Json$Encode$object(
-				_List_fromArray(
-					[
-						_Utils_Tuple2(
-						'type',
-						$elm$json$Json$Encode$string('bnode')),
-						_Utils_Tuple2(
-						'value',
-						$elm$json$Json$Encode$string(
-							'_:' + $author$project$RDF$blankNodeId(bnode)))
-					]));
-		},
-		function (literal) {
-			return $elm$json$Json$Encode$object(
-				A2(
-					$elm$core$List$filterMap,
-					$elm$core$Basics$identity,
-					_List_fromArray(
-						[
-							$elm$core$Maybe$Just(
-							_Utils_Tuple2(
-								'type',
-								$elm$json$Json$Encode$string('literal'))),
-							$elm$core$Maybe$Just(
-							_Utils_Tuple2(
-								'value',
-								$elm$json$Json$Encode$string(literal.value))),
-							$elm$core$Maybe$Just(
-							_Utils_Tuple2(
-								'datatype',
-								$elm$json$Json$Encode$string(literal.datatype))),
-							A2(
-							$elm$core$Maybe$map,
-							function (l) {
-								return _Utils_Tuple2(
-									'lang',
-									$elm$json$Json$Encode$string(l));
-							},
-							literal.language)
-						])));
-		});
-};
-var $author$project$RDF$mapPredicate = F2(
-	function (p, fIRI) {
-		return A4(
-			$author$project$RDF$mapNode,
-			p,
-			fIRI,
-			$author$project$RDF$blankNodeId,
-			function ($) {
-				return $.value;
-			});
-	});
-var $author$project$RDF$JSON$encodePredicate = function (p) {
-	return A2($author$project$RDF$mapPredicate, p, $elm$core$Basics$identity);
-};
-var $author$project$RDF$mapSubject = F3(
-	function (s, fIRI, fBlankNode) {
-		return A4(
-			$author$project$RDF$mapNode,
-			s,
-			fIRI,
-			fBlankNode,
-			function ($) {
-				return $.value;
-			});
-	});
-var $author$project$RDF$JSON$encodeSubject = function (s) {
-	return A3(
-		$author$project$RDF$mapSubject,
-		s,
-		function (iri) {
-			return iri;
-		},
-		function (bnode) {
-			return '_:' + $author$project$RDF$blankNodeId(bnode);
-		});
-};
-var $author$project$RDF$toList = function (_v0) {
-	var graph = _v0.a;
-	return graph;
-};
-var $author$project$RDF$graphGetObjects = F3(
-	function (graph, subject, predicate) {
-		return A2(
-			$elm$core$List$filterMap,
-			function (triple_) {
-				return (_Utils_eq(subject, triple_.subject) && _Utils_eq(predicate, triple_.predicate)) ? $elm$core$Maybe$Just(triple_.object) : $elm$core$Maybe$Nothing;
-			},
-			$author$project$RDF$toList(graph));
-	});
-var $elm$json$Json$Encode$list = F2(
-	function (func, entries) {
-		return _Json_wrap(
-			A3(
-				$elm$core$List$foldl,
-				_Json_addEntry(func),
-				_Json_emptyArray(_Utils_Tuple0),
-				entries));
-	});
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
-	});
-var $elm_community$list_extra$List$Extra$uniqueHelp = F4(
-	function (f, existing, remaining, accumulator) {
-		uniqueHelp:
-		while (true) {
-			if (!remaining.b) {
-				return $elm$core$List$reverse(accumulator);
-			} else {
-				var first = remaining.a;
-				var rest = remaining.b;
-				var computedFirst = f(first);
-				if (A2($elm$core$List$member, computedFirst, existing)) {
-					var $temp$f = f,
-						$temp$existing = existing,
-						$temp$remaining = rest,
-						$temp$accumulator = accumulator;
-					f = $temp$f;
-					existing = $temp$existing;
-					remaining = $temp$remaining;
-					accumulator = $temp$accumulator;
-					continue uniqueHelp;
-				} else {
-					var $temp$f = f,
-						$temp$existing = A2($elm$core$List$cons, computedFirst, existing),
-						$temp$remaining = rest,
-						$temp$accumulator = A2($elm$core$List$cons, first, accumulator);
-					f = $temp$f;
-					existing = $temp$existing;
-					remaining = $temp$remaining;
-					accumulator = $temp$accumulator;
-					continue uniqueHelp;
-				}
-			}
-		}
-	});
-var $elm_community$list_extra$List$Extra$uniqueBy = F2(
-	function (f, list) {
-		return A4($elm_community$list_extra$List$Extra$uniqueHelp, f, _List_Nil, list, _List_Nil);
-	});
-var $author$project$RDF$subjectPredicates = F2(
-	function (graph, s) {
-		return A2(
-			$elm_community$list_extra$List$Extra$uniqueBy,
-			function (p) {
-				return A2($author$project$RDF$mapPredicate, p, $elm$core$Basics$identity);
-			},
-			A2(
-				$elm$core$List$filterMap,
-				function (t_) {
-					return _Utils_eq(s, t_.subject) ? $elm$core$Maybe$Just(t_.predicate) : $elm$core$Maybe$Nothing;
-				},
-				$author$project$RDF$toList(graph)));
-	});
-var $author$project$RDF$subjects = function (graph) {
-	return A2(
-		$elm_community$list_extra$List$Extra$uniqueBy,
-		function (s) {
-			switch (s.$) {
-				case 'NodeIRI':
-					var i = s.a;
-					return i;
-				case 'NodeBlankNode':
-					var b = s.a.a;
-					return b;
-				default:
-					return '-';
-			}
-		},
-		A2(
-			$elm$core$List$map,
-			function ($) {
-				return $.subject;
-			},
-			$author$project$RDF$toList(graph)));
-};
-var $author$project$RDF$JSON$encode = function (graph) {
-	return $elm$json$Json$Encode$object(
-		A2(
-			$elm$core$List$map,
-			function (s) {
-				return _Utils_Tuple2(
-					$author$project$RDF$JSON$encodeSubject(s),
-					$elm$json$Json$Encode$object(
-						A2(
-							$elm$core$List$map,
-							function (p) {
-								return _Utils_Tuple2(
-									$author$project$RDF$JSON$encodePredicate(p),
-									A2(
-										$elm$json$Json$Encode$list,
-										$author$project$RDF$JSON$encodeObject,
-										A3($author$project$RDF$graphGetObjects, graph, s, p)));
-							},
-							A2($author$project$RDF$subjectPredicates, graph, s))));
-			},
-			$author$project$RDF$subjects(graph)));
-};
-var $author$project$RDF$Literal = F3(
-	function (value, datatype, language) {
-		return {datatype: datatype, language: language, value: value};
-	});
-var $author$project$RDF$literal = F3(
-	function (value, datatype, maybeLanguage) {
-		return A3($author$project$RDF$Literal, value, datatype, maybeLanguage);
-	});
-var $author$project$RDF$NodeBlankNode = function (a) {
-	return {$: 'NodeBlankNode', a: a};
-};
-var $author$project$RDF$objectBlankNode = function (bnode) {
-	return $author$project$RDF$NodeBlankNode(bnode);
-};
-var $author$project$RDF$NodeIRI = function (a) {
-	return {$: 'NodeIRI', a: a};
-};
-var $author$project$RDF$objectIRI = function (i) {
-	return $author$project$RDF$NodeIRI(i);
-};
-var $author$project$RDF$NodeLiteral = function (a) {
-	return {$: 'NodeLiteral', a: a};
-};
-var $author$project$RDF$objectLiteral = function (l) {
-	return $author$project$RDF$NodeLiteral(l);
-};
-var $author$project$RDF$predicateIRI = function (i) {
-	return $author$project$RDF$NodeIRI(i);
-};
-var $author$project$RDF$subjectBlankNode = function (bnode) {
-	return $author$project$RDF$NodeBlankNode(bnode);
-};
-var $author$project$RDF$rdf = $author$project$RDF$namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
-var $author$project$RDF$type_ = $author$project$RDF$predicateIRI(
-	$author$project$RDF$rdf('type'));
-var $author$project$RDF$xsd = $author$project$RDF$namespace('http://www.w3.org/2001/XMLSchema#');
-var $author$project$TalkToQUDT$encodeNote = function (content) {
-	var object_id = $author$project$RDF$blankNode('object');
-	var activity_id = $author$project$RDF$subjectBlankNode(
-		$author$project$RDF$blankNode('activity'));
-	return A2(
-		$elm$json$Json$Encode$encode,
-		2,
-		$author$project$RDF$JSON$encode(
-			A2(
-				$author$project$RDF$addTriple,
-				A3(
-					$author$project$RDF$Triple,
-					$author$project$RDF$subjectBlankNode(object_id),
-					$author$project$RDF$predicateIRI(
-						$author$project$TalkToQUDT$activityStreams('content')),
-					$author$project$RDF$objectLiteral(
-						A3(
-							$author$project$RDF$literal,
-							content,
-							$author$project$RDF$xsd('string'),
-							$elm$core$Maybe$Nothing))),
-				A2(
-					$author$project$RDF$addTriple,
-					A3(
-						$author$project$RDF$Triple,
-						$author$project$RDF$subjectBlankNode(object_id),
-						$author$project$RDF$type_,
-						$author$project$RDF$objectIRI(
-							$author$project$TalkToQUDT$activityStreams('Note'))),
-					A2(
-						$author$project$RDF$addTriple,
-						A3(
-							$author$project$RDF$Triple,
-							activity_id,
-							$author$project$RDF$predicateIRI(
-								$author$project$TalkToQUDT$activityStreams('object')),
-							$author$project$RDF$objectBlankNode(object_id)),
-						A2(
-							$author$project$RDF$addTriple,
-							A3(
-								$author$project$RDF$Triple,
-								activity_id,
-								$author$project$RDF$predicateIRI(
-									$author$project$TalkToQUDT$activityStreams('to')),
-								$author$project$RDF$objectIRI(
-									$author$project$TalkToQUDT$activityStreams('Public'))),
-							A2(
-								$author$project$RDF$addTriple,
-								A3(
-									$author$project$RDF$Triple,
-									activity_id,
-									$author$project$RDF$predicateIRI(
-										$author$project$TalkToQUDT$activityStreams('to')),
-									$author$project$RDF$objectIRI('http://localhost:4000/users/alice')),
-								A2(
-									$author$project$RDF$addTriple,
-									A3(
-										$author$project$RDF$Triple,
-										activity_id,
-										$author$project$RDF$type_,
-										$author$project$RDF$objectIRI(
-											$author$project$TalkToQUDT$activityStreams('Create'))),
-									$author$project$RDF$empty))))))));
-};
-var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$html$Html$header = _VirtualDom_node('header');
+var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -6689,80 +6295,39 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $elm$html$Html$Events$alwaysStop = function (x) {
-	return _Utils_Tuple2(x, true);
-};
-var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
-};
-var $elm$html$Html$Events$stopPropagationOn = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
-	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $elm$html$Html$Events$targetValue = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
-var $elm$html$Html$Events$onInput = function (tagger) {
-	return A2(
-		$elm$html$Html$Events$stopPropagationOn,
-		'input',
-		A2(
-			$elm$json$Json$Decode$map,
-			$elm$html$Html$Events$alwaysStop,
-			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
-};
 var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$html$Html$code = _VirtualDom_node('code');
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$url$Url$percentDecode = _Url_percentDecode;
 var $elm$html$Html$pre = _VirtualDom_node('pre');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
 	});
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$TalkToQUDT$composeNote = function (content) {
+var $author$project$TalkToQUDT$showResults = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$input,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$value(content),
-						$elm$html$Html$Events$onInput($author$project$TalkToQUDT$UpdateContent)
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick($author$project$TalkToQUDT$Post)
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Post')
-					])),
-				A2(
 				$elm$html$Html$p,
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('An encoded activity with the note looks like this (encoded as RDF/JSON):')
+						$elm$html$Html$text(
+						A2(
+							$elm$core$Maybe$withDefault,
+							model.query,
+							$elm$url$Url$percentDecode(
+								A3($elm$core$String$replace, '+', ' ', model.query))))
 					])),
 				A2(
 				$elm$html$Html$code,
@@ -6774,16 +6339,11 @@ var $author$project$TalkToQUDT$composeNote = function (content) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text(
-								$author$project$TalkToQUDT$encodeNote(content))
+								$elm$html$Html$text(model.content)
 							]))
 					]))
 			]));
 };
-var $elm$html$Html$h1 = _VirtualDom_node('h1');
-var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $elm$html$Html$header = _VirtualDom_node('header');
-var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $author$project$TalkToQUDT$view = function (model) {
 	return {
 		body: _List_fromArray(
@@ -6798,14 +6358,14 @@ var $author$project$TalkToQUDT$view = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Talk to QUDT')
+								$elm$html$Html$text('Talk to QUDT (v0.1)')
 							])),
 						A2(
 						$elm$html$Html$p,
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('This is a small example app that queries QUDT')
+								$elm$html$Html$text('Query the QUDT SPARQL Endpoint')
 							]))
 					])),
 				A2(
@@ -6818,12 +6378,32 @@ var $author$project$TalkToQUDT$view = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Query')
+								$elm$html$Html$text('SPARQL Query:')
 							])),
-						$author$project$TalkToQUDT$composeNote(model.content)
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$TalkToQUDT$QueryClasses)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Run Classes Query')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$TalkToQUDT$QueryTriples)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Run Triples Query')
+							])),
+						$author$project$TalkToQUDT$showResults(model)
 					]))
 			]),
-		title: 'Talk to QUDT'
+		title: 'Talk to QUDT (v0.1)'
 	};
 };
 var $author$project$TalkToQUDT$main = $elm$browser$Browser$document(
