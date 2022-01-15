@@ -39,11 +39,17 @@ prefixForRDFS =
 prefixForQUDT =
    Url.percentEncode "prefix qudt: <http://qudt.org/schema/qudt/>"
 
-prefixForEDG =
-   Url.percentEncode "prefix edg: <http://edg.topbraid.solutions/model/"
 
-encodedPrefixes =
-    prefixForOWL ++ prefixForQUDT ++ prefixForRDFS ++ prefixForEDG
+prefixForEDG : String
+prefixForEDG =
+   Url.percentEncode "prefix edg: <http://edg.topbraid.solutions/model/>"
+
+prefixForERA : String
+prefixForERA =
+   Url.percentEncode "prefix era: <http://www.era.europa.eu/era#>"
+
+encodedPrefixes = 
+    prefixForOWL ++ prefixForQUDT ++ prefixForRDFS ++ prefixForEDG ++ prefixForERA
 
 
 queryQUDTclasses =
@@ -77,29 +83,33 @@ queryQUDTtriples =
 
 queryEDGtasks =
     """
- SELECT ?subject ?predicate ?object
- WHERE {
-   ?subject ?predicate ?object
+ SELECT ?task ?predicate ?object
+ WHERE { GRAPH <urn:x-evn-master:era_roadmap> {
+   ?task a era:RoadmapItem .
+   ?task ?predicate ?object .
+   }
  }
  """
 
 
-sparqlQuery : String -> Int -> String
+sparqlQuery : String -> Maybe Int -> String
 sparqlQuery query max =
-    query ++ "LIMIT" ++ String.fromInt max
+    case max of
+      Just n ->  query ++ " LIMIT " ++ String.fromInt n
+      Nothing -> query
 
 
 queryUnits =
-    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTunits 20000))
+    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTunits <| Just 20000))
 
 queryClasses =
-    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTclasses 1000))
+    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTclasses <| Just 1000))
 
 queryTasks =
-    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryEDGtasks 10))
+    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryEDGtasks Nothing))
 
 queryTriples =
-    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTtriples 10))
+    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTtriples <| Just 10))
 
 
 main : Program {} Model Msg
@@ -138,12 +148,13 @@ queryEndpoint : SPARQLquery -> Cmd Msg
 queryEndpoint query =
     Http.request
         { method = "POST"
-        , headers =
-         [ (Http.header "Authorization" "Basic" ) --  WwoUNbaz3ZDW3baPn8fs8ut11EU=")
-          ,(Http.header "Origin" "file:///Users/ralphtq/git-ralphtq/elm/elm-linked-data/index.html")
-         ]
+        , headers = []
+        --  [ Http.header "Authorization" "Basic"  --  WwoUNbaz3ZDW3baPn8fs8ut11EU="
+        --   ,Http.header "X-Requested-With" "XMLHttpRequest"
+        --   ,Http.header "Origin" "http://localhost:8083/tbl"
+        --  ]
         , url = "http://localhost:8083/tbl/sparql" -- "http://localhost:8083/tbl" -- "https://edg.doa.topbraid.net/edg/tbl"
-        , body = Http.stringBody "application/x-www-form-urlencoded" ("query=" ++ query)
+        , body = Http.stringBody "application/x-www-form-urlencoded" ("query=" ++ query ++ "&format=JSON")
         -- , body = Http.stringBody 
         --    "application/x-www-form-urlencoded, application/json, text/plain, */*" "" -- ("query=" ++ "") -- ("query=" ++ query)
         , expect = Http.expectString GotQueryResponse
