@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>TalkToQUDT</title>
+  <title>TalkToEDG</title>
   <style>body { padding: 0; margin: 0; }</style>
 </head>
 
@@ -5361,7 +5361,7 @@ var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $Fresheyeball$elm_return$Return$singleton = function (a) {
 	return _Utils_Tuple2(a, $elm$core$Platform$Cmd$none);
 };
-var $author$project$TalkToQUDT$init = function (flags) {
+var $author$project$TalkToEDG$init = function (flags) {
 	return $Fresheyeball$elm_return$Return$singleton(
 		{
 			content: '',
@@ -5371,7 +5371,7 @@ var $author$project$TalkToQUDT$init = function (flags) {
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$TalkToQUDT$subscriptions = function (model) {
+var $author$project$TalkToEDG$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
 var $Fresheyeball$elm_return$Return$command = F2(
@@ -5385,13 +5385,16 @@ var $Fresheyeball$elm_return$Return$command = F2(
 					[cmd, cmd_])));
 	});
 var $elm$url$Url$percentEncode = _Url_percentEncode;
-var $author$project$TalkToQUDT$prefixForOWL = $elm$url$Url$percentEncode('prefix owl:  <http://www.w3.org/2002/07/owl#>');
-var $author$project$TalkToQUDT$prefixForQUDT = $elm$url$Url$percentEncode('prefix qudt: <http://qudt.org/schema/qudt/>');
-var $author$project$TalkToQUDT$prefixForRDFS = $elm$url$Url$percentEncode('prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>');
-var $author$project$TalkToQUDT$encodedPrefixes = _Utils_ap(
-	$author$project$TalkToQUDT$prefixForOWL,
-	_Utils_ap($author$project$TalkToQUDT$prefixForQUDT, $author$project$TalkToQUDT$prefixForRDFS));
-var $author$project$TalkToQUDT$queryQUDTclasses = '\n SELECT ?class ?label ?description\n WHERE {\n     ?class a owl:Class .\n     OPTIONAL {?class rdfs:label ?label}\n     OPTIONAL {?class rdfs:comment ?description}\n }\n ';
+var $author$project$TalkToEDG$prefixForEDG = $elm$url$Url$percentEncode('prefix edg: <http://edg.topbraid.solutions/model/');
+var $author$project$TalkToEDG$prefixForOWL = $elm$url$Url$percentEncode('prefix owl:  <http://www.w3.org/2002/07/owl#>');
+var $author$project$TalkToEDG$prefixForQUDT = $elm$url$Url$percentEncode('prefix qudt: <http://qudt.org/schema/qudt/>');
+var $author$project$TalkToEDG$prefixForRDFS = $elm$url$Url$percentEncode('prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>');
+var $author$project$TalkToEDG$encodedPrefixes = _Utils_ap(
+	$author$project$TalkToEDG$prefixForOWL,
+	_Utils_ap(
+		$author$project$TalkToEDG$prefixForQUDT,
+		_Utils_ap($author$project$TalkToEDG$prefixForRDFS, $author$project$TalkToEDG$prefixForEDG)));
+var $author$project$TalkToEDG$queryQUDTclasses = '\n SELECT ?class ?label ?description\n WHERE {\n     ?class a owl:Class .\n     OPTIONAL {?class rdfs:label ?label}\n     OPTIONAL {?class rdfs:comment ?description}\n }\n ';
 var $elm$core$String$replace = F3(
 	function (before, after, string) {
 		return A2(
@@ -5399,19 +5402,19 @@ var $elm$core$String$replace = F3(
 			after,
 			A2($elm$core$String$split, before, string));
 	});
-var $author$project$TalkToQUDT$sparqlQuery = F2(
+var $author$project$TalkToEDG$sparqlQuery = F2(
 	function (query, max) {
 		return query + ('LIMIT' + $elm$core$String$fromInt(max));
 	});
-var $author$project$TalkToQUDT$queryClasses = _Utils_ap(
-	$author$project$TalkToQUDT$encodedPrefixes,
+var $author$project$TalkToEDG$queryClasses = _Utils_ap(
+	$author$project$TalkToEDG$encodedPrefixes,
 	A3(
 		$elm$core$String$replace,
 		'%20',
 		'+',
 		$elm$url$Url$percentEncode(
-			A2($author$project$TalkToQUDT$sparqlQuery, $author$project$TalkToQUDT$queryQUDTclasses, 10))));
-var $author$project$TalkToQUDT$GotQueryResponse = function (a) {
+			A2($author$project$TalkToEDG$sparqlQuery, $author$project$TalkToEDG$queryQUDTclasses, 1000))));
+var $author$project$TalkToEDG$GotQueryResponse = function (a) {
 	return {$: 'GotQueryResponse', a: a};
 };
 var $elm$http$Http$BadStatus_ = F2(
@@ -6194,40 +6197,50 @@ var $elm$http$Http$request = function (r) {
 			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
 };
 var $elm$http$Http$stringBody = _Http_pair;
-var $author$project$TalkToQUDT$queryEndpoint = function (query) {
+var $author$project$TalkToEDG$queryEndpoint = function (query) {
 	return $elm$http$Http$request(
 		{
 			body: A2($elm$http$Http$stringBody, 'application/x-www-form-urlencoded', 'query=' + query),
-			expect: $elm$http$Http$expectString($author$project$TalkToQUDT$GotQueryResponse),
+			expect: $elm$http$Http$expectString($author$project$TalkToEDG$GotQueryResponse),
 			headers: _List_fromArray(
 				[
-					A2($elm$http$Http$header, 'Authorization', 'Basic')
+					A2($elm$http$Http$header, 'Authorization', 'Basic'),
+					A2($elm$http$Http$header, 'Origin', 'file:///Users/ralphtq/git-ralphtq/elm/elm-linked-data/index.html')
 				]),
 			method: 'POST',
 			timeout: $elm$core$Maybe$Nothing,
 			tracker: $elm$core$Maybe$Nothing,
-			url: 'http://www.qudt.org/fuseki/qudt/query'
+			url: 'http://localhost:8083/tbl/sparql'
 		});
 };
-var $author$project$TalkToQUDT$queryQUDTtriples = '\n SELECT ?subject ?predicate ?object\n WHERE {\n   ?subject ?predicate ?object\n }\n ';
-var $author$project$TalkToQUDT$queryTriples = _Utils_ap(
-	$author$project$TalkToQUDT$encodedPrefixes,
+var $author$project$TalkToEDG$queryEDGtasks = '\n SELECT ?subject ?predicate ?object\n WHERE {\n   ?subject ?predicate ?object\n }\n ';
+var $author$project$TalkToEDG$queryTasks = _Utils_ap(
+	$author$project$TalkToEDG$encodedPrefixes,
 	A3(
 		$elm$core$String$replace,
 		'%20',
 		'+',
 		$elm$url$Url$percentEncode(
-			A2($author$project$TalkToQUDT$sparqlQuery, $author$project$TalkToQUDT$queryQUDTtriples, 10))));
-var $author$project$TalkToQUDT$queryQUDTunits = '\n SELECT ?unit ?p ?o\n WHERE {\n     ?unit a qudt:Unit .\n     ?unit ?p ?o .\n }\n ';
-var $author$project$TalkToQUDT$queryUnits = _Utils_ap(
-	$author$project$TalkToQUDT$encodedPrefixes,
+			A2($author$project$TalkToEDG$sparqlQuery, $author$project$TalkToEDG$queryEDGtasks, 10))));
+var $author$project$TalkToEDG$queryQUDTtriples = '\n SELECT ?subject ?predicate ?object\n WHERE {\n   ?subject ?predicate ?object\n }\n ';
+var $author$project$TalkToEDG$queryTriples = _Utils_ap(
+	$author$project$TalkToEDG$encodedPrefixes,
 	A3(
 		$elm$core$String$replace,
 		'%20',
 		'+',
 		$elm$url$Url$percentEncode(
-			A2($author$project$TalkToQUDT$sparqlQuery, $author$project$TalkToQUDT$queryQUDTunits, 20))));
-var $author$project$TalkToQUDT$update = F2(
+			A2($author$project$TalkToEDG$sparqlQuery, $author$project$TalkToEDG$queryQUDTtriples, 10))));
+var $author$project$TalkToEDG$queryQUDTunits = '\n SELECT ?unit ?p ?o\n WHERE {\n     ?unit a qudt:Unit .\n     ?unit ?p ?o .\n }\n ';
+var $author$project$TalkToEDG$queryUnits = _Utils_ap(
+	$author$project$TalkToEDG$encodedPrefixes,
+	A3(
+		$elm$core$String$replace,
+		'%20',
+		'+',
+		$elm$url$Url$percentEncode(
+			A2($author$project$TalkToEDG$sparqlQuery, $author$project$TalkToEDG$queryQUDTunits, 20000))));
+var $author$project$TalkToEDG$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'Receive':
@@ -6252,31 +6265,39 @@ var $author$project$TalkToQUDT$update = F2(
 			case 'QueryClasses':
 				return A2(
 					$Fresheyeball$elm_return$Return$command,
-					$author$project$TalkToQUDT$queryEndpoint($author$project$TalkToQUDT$queryClasses),
+					$author$project$TalkToEDG$queryEndpoint($author$project$TalkToEDG$queryClasses),
 					$Fresheyeball$elm_return$Return$singleton(
 						_Utils_update(
 							model,
-							{query: $author$project$TalkToQUDT$queryClasses})));
+							{query: $author$project$TalkToEDG$queryClasses})));
 			case 'QueryUnits':
 				return A2(
 					$Fresheyeball$elm_return$Return$command,
-					$author$project$TalkToQUDT$queryEndpoint($author$project$TalkToQUDT$queryUnits),
+					$author$project$TalkToEDG$queryEndpoint($author$project$TalkToEDG$queryUnits),
 					$Fresheyeball$elm_return$Return$singleton(
 						_Utils_update(
 							model,
-							{query: $author$project$TalkToQUDT$queryUnits})));
+							{query: $author$project$TalkToEDG$queryUnits})));
+			case 'QueryTasks':
+				return A2(
+					$Fresheyeball$elm_return$Return$command,
+					$author$project$TalkToEDG$queryEndpoint($author$project$TalkToEDG$queryTasks),
+					$Fresheyeball$elm_return$Return$singleton(
+						_Utils_update(
+							model,
+							{query: $author$project$TalkToEDG$queryTasks})));
 			case 'QueryTriples':
 				return A2(
 					$Fresheyeball$elm_return$Return$command,
-					$author$project$TalkToQUDT$queryEndpoint($author$project$TalkToQUDT$queryTriples),
+					$author$project$TalkToEDG$queryEndpoint($author$project$TalkToEDG$queryTriples),
 					$Fresheyeball$elm_return$Return$singleton(
 						_Utils_update(
 							model,
-							{query: $author$project$TalkToQUDT$queryTriples})));
+							{query: $author$project$TalkToEDG$queryTriples})));
 			case 'Refresh':
 				return A2(
 					$Fresheyeball$elm_return$Return$command,
-					$author$project$TalkToQUDT$queryEndpoint($author$project$TalkToQUDT$queryClasses),
+					$author$project$TalkToEDG$queryEndpoint($author$project$TalkToEDG$queryClasses),
 					$Fresheyeball$elm_return$Return$singleton(model));
 			default:
 				var result = msg.a;
@@ -6291,9 +6312,7 @@ var $author$project$TalkToQUDT$update = F2(
 				}
 		}
 	});
-var $author$project$TalkToQUDT$QueryClasses = {$: 'QueryClasses'};
-var $author$project$TalkToQUDT$QueryTriples = {$: 'QueryTriples'};
-var $author$project$TalkToQUDT$QueryUnits = {$: 'QueryUnits'};
+var $author$project$TalkToEDG$QueryTasks = {$: 'QueryTasks'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
@@ -6332,7 +6351,7 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$TalkToQUDT$showResults = function (model) {
+var $author$project$TalkToEDG$showResults = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -6365,7 +6384,7 @@ var $author$project$TalkToQUDT$showResults = function (model) {
 					]))
 			]));
 };
-var $author$project$TalkToQUDT$view = function (model) {
+var $author$project$TalkToEDG$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
@@ -6379,14 +6398,14 @@ var $author$project$TalkToQUDT$view = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Talk to QUDT (v0.1)')
+								$elm$html$Html$text('Talk to EDG (v0.2)')
 							])),
 						A2(
 						$elm$html$Html$p,
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Query the QUDT SPARQL Endpoint')
+								$elm$html$Html$text('Query EDG API')
 							]))
 					])),
 				A2(
@@ -6405,45 +6424,25 @@ var $author$project$TalkToQUDT$view = function (model) {
 						$elm$html$Html$button,
 						_List_fromArray(
 							[
-								$elm$html$Html$Events$onClick($author$project$TalkToQUDT$QueryTriples)
+								$elm$html$Html$Events$onClick($author$project$TalkToEDG$QueryTasks)
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Run Triples Query')
+								$elm$html$Html$text('Query for Tasks')
 							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$TalkToQUDT$QueryClasses)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Run Classes Query')
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$TalkToQUDT$QueryUnits)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Run Units Query')
-							])),
-						$author$project$TalkToQUDT$showResults(model)
+						$author$project$TalkToEDG$showResults(model)
 					]))
 			]),
-		title: 'Talk to QUDT (v0.1)'
+		title: 'Talk to EDG (v0.2)'
 	};
 };
-var $author$project$TalkToQUDT$main = $elm$browser$Browser$document(
-	{init: $author$project$TalkToQUDT$init, subscriptions: $author$project$TalkToQUDT$subscriptions, update: $author$project$TalkToQUDT$update, view: $author$project$TalkToQUDT$view});
-_Platform_export({'TalkToQUDT':{'init':$author$project$TalkToQUDT$main(
+var $author$project$TalkToEDG$main = $elm$browser$Browser$document(
+	{init: $author$project$TalkToEDG$init, subscriptions: $author$project$TalkToEDG$subscriptions, update: $author$project$TalkToEDG$update, view: $author$project$TalkToEDG$view});
+_Platform_export({'TalkToEDG':{'init':$author$project$TalkToEDG$main(
 	$elm$json$Json$Decode$succeed(
 		{}))(0)}});}(this));
 
-  var app = Elm.TalkToQUDT.init({ node: document.getElementById("elm") });
+  var app = Elm.TalkToEDG.init({ node: document.getElementById("elm") });
 }
 catch (e)
 {
