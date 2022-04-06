@@ -4,6 +4,10 @@ module TalkToQUDT exposing (Model, Msg(..), init, main, subscriptions, update, v
 
 import Browser as B
 import Debug
+import Element as E exposing (..)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Font as Font
 import Html as H
 import Html.Attributes as HA
 import Html.Events as HE
@@ -88,15 +92,36 @@ queryTriples =
     encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTtriples 1000))
 
 
-main : Program {} Model Msg
-main =
-    B.document
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
+-- main : Program {} Model Msg
+-- main =
+--     B.document
+--         { init = init
+--         , view = view
+--         , update = update
+--         , subscriptions = subscriptions
+--         }
 
+main = 
+    E.layout [] view
+
+
+-- myRowOfStuff =
+--     row [ width fill, centerY, spacing 30 ]
+--         [ myElement
+--         , myElement
+--         , el [ alignRight ] myElement
+--         ]
+
+
+-- myElement : Element msg
+-- myElement =
+--     el
+--         [ Background.color (rgb255 240 0 245)
+--         , Font.color (rgb255 255 255 255)
+--         , Border.rounded 3
+--         , padding 30
+--         ]
+--         (text "stylish!")
 
 -- MODEL
 
@@ -224,24 +249,85 @@ showResults model =
         ]
 
 
-view : Model -> B.Document Msg
-view model =
-    { title = "Talk to QUDT (v0.3)"
-    , body =
-        [ H.header []
-            [ H.h1 [] [ H.text "Talk to QUDT (v0.3)" ]
-            , H.p [] [ H.text "Query the QUDT SPARQL Endpoint" ]
-            ]
-        , H.main_
-            []
-            [ H.h2 []
-                [ "SPARQL Query:"
-                    |> H.text
-                ]
-            , H.button [ HE.onClick QueryTriples ] [ H.text "Run Triples Query" ]
-            , H.button [ HE.onClick QueryClasses ] [ H.text "Run Classes Query" ]
-            , H.button [ HE.onClick QueryUnits ] [ H.text "Run Units Query" ]
-            , showResults model
-            ]
-        ]
-    }
+view  = 
+  E.column
+    [ E.width fill
+    , E.height fill
+    ]
+    [ header
+    , middle
+    , footer
+    ]
+
+header =
+  E.row 
+    [ Border.width 1
+    , E.paddingXY 20 10
+    , E.width fill
+    ]
+    [ text "QUDT logo"
+    , menuButton 16 annotation
+    ]
+
+middle = 
+  E.row
+    [ E.width fill
+    , E.height fill
+    -- , explain Debug.todo
+    ]
+    [ sidebar, content]
+
+sidebar =
+  List.range 1 30
+    |> List.map (\num -> "item" ++ String.fromInt num)
+    |> List.map text
+    |> E.column [ E.height fill, Border.width 1] 
+
+--   E.column [ height fill
+--   , Border.width 1]
+--     [ text "Item 1"
+--     , text "item 2"
+--     ]
+
+menuButton paddingAmount myAnnotation =
+  el 
+    [ alignRight
+     , padding paddingAmount
+     , Border.width 1
+     , Border.rounded 4
+     , pointer
+     , mouseOver [ Background.color (rgb 0 1 0)]
+     , inFront myAnnotation
+    ] (text "MenuButton")
+
+annotation =
+   el [ alignBottom, alignRight] (text "tbd")
+
+content =
+    el [width fill, height fill] <| el [ E.centerX, E.centerY] (text "content" )
+
+footer = 
+   text "footer"
+
+
+-- view : Model -> B.Document Msg
+-- view model = 
+    -- { title = "Talk to QUDT (v0.3)"
+    -- , body =
+    --     [ H.header []
+    --         [ H.h1 [] [ H.text "Talk to QUDT (v0.3)" ]
+    --         , H.p [] [ H.text "Query the QUDT SPARQL Endpoint" ]
+    --         ]
+    --     , H.main_
+    --         []
+    --         [ H.h2 []
+    --             [ "SPARQL Query:"
+    --                 |> H.text
+    --             ]
+    --         , H.button [ HE.onClick QueryTriples ] [ H.text "Run Triples Query" ]
+    --         , H.button [ HE.onClick QueryClasses ] [ H.text "Run Classes Query" ]
+    --         , H.button [ HE.onClick QueryUnits ] [ H.text "Run Units Query" ]
+    --         , showResults model
+    --         ]
+    --     ]
+    -- }
