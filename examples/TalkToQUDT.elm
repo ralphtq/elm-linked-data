@@ -121,9 +121,12 @@ queryEndpoint : SPARQLquery -> Cmd Msg
 queryEndpoint query =
     Http.request
         { method = "POST"
-        , headers = [ Http.header "Authorization" "Basic" ]
+        , headers = [ Http.header "Authorization" "Basic" 
+                    --   , Http.header "Content-Type" "application/sparql-results+json;charset=utf-8"
+                      ]
         , url = "http://www.qudt.org/fuseki/qudt/query"
         , body = Http.stringBody "application/x-www-form-urlencoded" ("query=" ++ query)
+        -- , body = Http.stringBody "application/sparql-results+json;charset=utf-8" ("query=" ++ query)
         , expect = Http.expectString GotQueryResponse
         , timeout = Nothing
         , tracker = Nothing
