@@ -91,16 +91,16 @@ queryEDGtasks =
  }
  """
 
+executeADScall = "todo"
+
+completionDaysForDependency = "todo"
+
 
 sparqlQuery : String -> Maybe Int -> String
 sparqlQuery query max =
     case max of
       Just n ->  query ++ " LIMIT " ++ String.fromInt n
       Nothing -> query
-
-
-queryUnits =
-    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTunits <| Just 20000))
 
 queryClasses =
     encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTclasses <| Just 1000))
@@ -163,6 +163,22 @@ queryEndpoint query =
         }
 
 
+adsEndpoint : String -> Cmd Msg
+adsEndpoint payload =
+    Http.request
+        { method = "POST"
+        , headers = []
+        --  [ Http.header "Authorization" "Basic"  --  WwoUNbaz3ZDW3baPn8fs8ut11EU="
+        --   ,Http.header "X-Requested-With" "XMLHttpRequest"
+        --   ,Http.header "Origin" "http://localhost:8083/tbl"
+        --  ]
+        , url = "http://localhost:8083/tbl/ads"
+        , body = Http.stringBody "application/x-www-form-urlencoded" ("payload=" ++ payload ++ "&format=JSON")
+        , expect = Http.expectString GotADSresponse
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+
 
 -- UPDATE
 
@@ -173,10 +189,10 @@ type Msg
     | QueryClasses
     | QueryTasks
     | QueryTriples
-    | QueryUnits
+    | QueryADS
     | Refresh
     | GotQueryResponse (Result Http.Error String)
-
+    | GotADSresponse (Result Http.Error String)
 
 update : Msg -> Model -> Return Msg Model
 update msg model =
@@ -199,10 +215,10 @@ update msg model =
                 |> Return.singleton
                 |> Return.command (queryEndpoint queryClasses)
         
-        QueryUnits ->
-            { model | query = queryUnits }
+        QueryADS ->
+            { model | query = completionDaysForDependency }
                 |> Return.singleton
-                |> Return.command (queryEndpoint queryUnits)
+                |> Return.command (adsEndpoint completionDaysForDependency)
         
         QueryTasks ->
             { model | query = queryTasks }
@@ -226,6 +242,14 @@ update msg model =
 
                 Err _ ->
                     model |> Return.singleton
+        
+        GotADSresponse result ->
+            case result of
+                Ok response ->
+                    { model | content = "" } |> Return.singleton
+
+                Err _ ->
+                     { model | content = "Error - not implemented yet" } |> Return.singleton
 
 
 
@@ -262,19 +286,24 @@ showResults model =
 
 view : Model -> B.Document Msg
 view model =
-    { title = "Talk to EDG (v0.2)"
+    { title = "EDG API Tests (v0.2)"
     , body =
         [ H.header []
-            [ H.h1 [] [ H.text "Talk to EDG (v0.2)" ]
-            , H.p [] [ H.text "Query EDG API" ]
+            [ H.h1 [] [ H.text "EDG API Tests (v0.2)" ]
+            , H.p [] [ H.text "Test EDG APIs" ]
             ]
         , H.main_
             []
             [ H.h2 []
-                [ "SPARQL Query:"
+                [ "Run Checks:"
                     |> H.text
                 ]
+            , H.button [ ] [ H.text "Asset Collection Graphs" ]
+            , H.button [ ] [ H.text "Governance Services" ] 
             , H.button [ HE.onClick QueryTasks ] [ H.text "Query for Tasks" ]
+            , H.button [ HE.onClick QueryADS ] [ H.text "Call ADS Service" ]
+            , H.button [ ] [ H.text "Call GraphQL Service" ]
+            , H.button [ ] [ H.text "Request Statistics" ]
             , showResults model
             ]
         ]

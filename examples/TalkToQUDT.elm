@@ -78,14 +78,14 @@ sparqlQuery query max =
 
 
 queryUnits =
-    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTunits 20000))
+    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTunits 40000))
 
 queryClasses =
-    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTclasses 1000))
+    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTclasses 2000))
 
 
 queryTriples =
-    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTtriples 10))
+    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTtriples 1000))
 
 
 main : Program {} Model Msg
@@ -223,10 +223,10 @@ showResults model =
 
 view : Model -> B.Document Msg
 view model =
-    { title = "Talk to QUDT (v0.2)"
+    { title = "Talk to QUDT (v0.3)"
     , body =
         [ H.header []
-            [ H.h1 [] [ H.text "Talk to QUDT (v0.2)" ]
+            [ H.h1 [] [ H.text "Talk to QUDT (v0.3)" ]
             , H.p [] [ H.text "Query the QUDT SPARQL Endpoint" ]
             ]
         , H.main_
