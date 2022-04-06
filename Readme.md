@@ -18,3 +18,8 @@ Implements basic RDF data types and serializations.
 - [ ] JSON-LD encoding
 - [x] Extract/decode data from a RDF graph (as you would decode from a Json)
 
+##  QUDT Work
+
+As a test example try:
+
+$ elm make examples/TalkToQUDT.elm
