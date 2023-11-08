@@ -6238,7 +6238,7 @@ var $author$project$TalkToQUDT$queryTriples = _Utils_ap(
 				$author$project$TalkToQUDT$sparqlQuery,
 				$author$project$TalkToQUDT$queryQUDTtriples,
 				$elm$core$Maybe$Just(1000)))));
-var $author$project$TalkToQUDT$queryQUDTunits = '\n SELECT ?unit ?p ?o\n WHERE {\n     ?unit a qudt:Unit .\n     ?unit ?p ?o .\n }\n ';
+var $author$project$TalkToQUDT$queryQUDTunits = '\n SELECT ?unit ?label\n WHERE {\n     ?unit a qudt:Unit .\n     ?unit rdfs:label ?label .\n     FILTER (LANG(?label) = "en")\n } ORDER BY ?ul\n ';
 var $author$project$TalkToQUDT$queryUnits = _Utils_ap(
 	$author$project$TalkToQUDT$encodedPrefixes,
 	A3(

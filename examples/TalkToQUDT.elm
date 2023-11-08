@@ -57,11 +57,12 @@ queryQUDTclasses =
 
 queryQUDTunits =
     """
- SELECT ?unit ?p ?o
+ SELECT ?unit ?label
  WHERE {
      ?unit a qudt:Unit .
-     ?unit ?p ?o .
- }
+     ?unit rdfs:label ?label .
+     FILTER (LANG(?label) = "en")
+ } ORDER BY ?ul
  """
 
 queryCountOfUnits =
