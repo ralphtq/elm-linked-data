@@ -1,7 +1,5 @@
 module TalkToQUDT exposing (Model, Msg(..), init, main, subscriptions, update, view)
 
---
-
 import Browser as B
 import Debug
 import Element as E exposing (..)
@@ -31,7 +29,7 @@ type alias SPARQLquery =
 
 qudtQueryEndpointURL : String
 qudtQueryEndpointURL =
-    "http://www.qudt.org/fuseki/qudt/query"
+    "https://www.qudt.org/fuseki/qudt/query"
 
 
 prefixForOWL =
@@ -66,6 +64,21 @@ queryQUDTunits =
  }
  """
 
+queryCountOfUnits =
+    """
+ SELECT 
+    (COUNT(?unit) AS ?numberOfUnits) 
+    (COUNT(?qk) AS ?numberOfQuantityKinds)
+    (COUNT(?constant) AS ?numberOfConstants)
+ WHERE {
+    {?unit a qudt:Unit }
+    UNION
+    {?qk a qudt:QuantityKind}
+    UNION
+    {?constant a qudt:PhysicalConstant}
+ }
+ """
+
 
 queryQUDTtriples =
     """
@@ -76,52 +89,35 @@ queryQUDTtriples =
  """
 
 
-sparqlQuery : String -> Int -> String
+sparqlQuery : String -> Maybe Int -> String
 sparqlQuery query max =
-    query ++ "LIMIT" ++ String.fromInt max
+    case max of
+      Just n -> query ++ "LIMIT" ++ " " ++ String.fromInt n
+      Nothing -> query
 
 
 queryUnits =
-    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTunits 40000))
+    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTunits <| Just 40000))
+
+queryCounts =
+    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryCountOfUnits Nothing))
 
 queryClasses =
-    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTclasses 2000))
+    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTclasses <| Just 2000))
 
 
 queryTriples =
-    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTtriples 1000))
+    encodedPrefixes ++ String.replace "%20" "+" (Url.percentEncode (sparqlQuery queryQUDTtriples <| Just 1000))
 
 
--- main : Program {} Model Msg
--- main =
---     B.document
---         { init = init
---         , view = view
---         , update = update
---         , subscriptions = subscriptions
---         }
-
-main = 
-    E.layout [] view
-
-
--- myRowOfStuff =
---     row [ width fill, centerY, spacing 30 ]
---         [ myElement
---         , myElement
---         , el [ alignRight ] myElement
---         ]
-
-
--- myElement : Element msg
--- myElement =
---     el
---         [ Background.color (rgb255 240 0 245)
---         , Font.color (rgb255 255 255 255)
---         , Border.rounded 3
---         , padding 30
---         ]
---         (text "stylish!")
+main : Program {} Model Msg
+main =
+    B.document
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
 
 -- MODEL
 
@@ -146,10 +142,11 @@ queryEndpoint : SPARQLquery -> Cmd Msg
 queryEndpoint query =
     Http.request
         { method = "POST"
-        , headers = [ Http.header "Authorization" "Basic" 
-                    --   , Http.header "Content-Type" "application/sparql-results+json;charset=utf-8"
-                      ]
-        , url = "http://www.qudt.org/fuseki/qudt/query"
+        , headers = [ 
+              Http.header "Authorization" "Basic" 
+            -- , Http.header "Content-Type" "application/sparql-results+json;charset=utf-8"
+             ]
+        , url = "https://www.qudt.org/fuseki/qudt/query"
         , body = Http.stringBody "application/x-www-form-urlencoded" ("query=" ++ query)
         -- , body = Http.stringBody "application/sparql-results+json;charset=utf-8" ("query=" ++ query)
         , expect = Http.expectString GotQueryResponse
@@ -168,6 +165,7 @@ type Msg
     | QueryClasses
     | QueryTriples
     | QueryUnits
+    | QueryCounts
     | Refresh
     | GotQueryResponse (Result Http.Error String)
 
@@ -197,6 +195,11 @@ update msg model =
             { model | query = queryUnits }
                 |> Return.singleton
                 |> Return.command (queryEndpoint queryUnits)
+        
+        QueryCounts ->
+            { model | query = queryCounts }
+                |> Return.singleton
+                |> Return.command (queryEndpoint queryCounts)
 
         QueryTriples ->
             { model | query = queryTriples }
@@ -248,86 +251,24 @@ showResults model =
             ]
         ]
 
-
-view  = 
-  E.column
-    [ E.width fill
-    , E.height fill
-    ]
-    [ header
-    , middle
-    , footer
-    ]
-
-header =
-  E.row 
-    [ Border.width 1
-    , E.paddingXY 20 10
-    , E.width fill
-    ]
-    [ text "QUDT logo"
-    , menuButton 16 annotation
-    ]
-
-middle = 
-  E.row
-    [ E.width fill
-    , E.height fill
-    -- , explain Debug.todo
-    ]
-    [ sidebar, content]
-
-sidebar =
-  List.range 1 30
-    |> List.map (\num -> "item" ++ String.fromInt num)
-    |> List.map text
-    |> E.column [ E.height fill, Border.width 1] 
-
---   E.column [ height fill
---   , Border.width 1]
---     [ text "Item 1"
---     , text "item 2"
---     ]
-
-menuButton paddingAmount myAnnotation =
-  el 
-    [ alignRight
-     , padding paddingAmount
-     , Border.width 1
-     , Border.rounded 4
-     , pointer
-     , mouseOver [ Background.color (rgb 0 1 0)]
-     , inFront myAnnotation
-    ] (text "MenuButton")
-
-annotation =
-   el [ alignBottom, alignRight] (text "tbd")
-
-content =
-    el [width fill, height fill] <| el [ E.centerX, E.centerY] (text "content" )
-
-footer = 
-   text "footer"
-
-
--- view : Model -> B.Document Msg
--- view model = 
-    -- { title = "Talk to QUDT (v0.3)"
-    -- , body =
-    --     [ H.header []
-    --         [ H.h1 [] [ H.text "Talk to QUDT (v0.3)" ]
-    --         , H.p [] [ H.text "Query the QUDT SPARQL Endpoint" ]
-    --         ]
-    --     , H.main_
-    --         []
-    --         [ H.h2 []
-    --             [ "SPARQL Query:"
-    --                 |> H.text
-    --             ]
-    --         , H.button [ HE.onClick QueryTriples ] [ H.text "Run Triples Query" ]
-    --         , H.button [ HE.onClick QueryClasses ] [ H.text "Run Classes Query" ]
-    --         , H.button [ HE.onClick QueryUnits ] [ H.text "Run Units Query" ]
-    --         , showResults model
-    --         ]
-    --     ]
-    -- }
+view : Model -> B.Document Msg
+view model = 
+    { title = "Talk to QUDT (v0.4)"
+    , body =
+        [ H.header []
+            [ H.h1 [] [ H.text "Talk to QUDT (v0.4)" ]
+            , H.p [] [ H.text "Query the QUDT SPARQL Endpoint" ]
+            ]
+        , H.main_
+            []
+            [ H.h2 []
+                [ H.text "SPARQL Query:"
+                ]
+            , H.button [ HE.onClick QueryTriples ] [ H.text "Run Triples Query" ]
+            , H.button [ HE.onClick QueryClasses ] [ H.text "Run Classes Query" ]
+            , H.button [ HE.onClick QueryUnits ] [ H.text "Run Units Query" ]
+            , H.button [ HE.onClick QueryCounts ] [ H.text "Run Counts Query" ]
+            , showResults model
+            ]
+        ]
+    }

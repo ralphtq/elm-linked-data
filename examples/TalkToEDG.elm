@@ -27,7 +27,7 @@ type alias SPARQLquery =
 
 qudtQueryEndpointURL : String
 qudtQueryEndpointURL =
-    "http://www.qudt.org/fuseki/qudt/query"
+    "https://www.qudt.org/fuseki/qudt/query"
 
 
 prefixForOWL =
